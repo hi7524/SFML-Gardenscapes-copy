@@ -60,5 +60,4 @@ public:
 
 	virtual void Update(float dt) = 0;
 	virtual void Draw(sf::RenderWindow& window) = 0;
-
 };

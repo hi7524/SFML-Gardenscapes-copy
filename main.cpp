@@ -2,7 +2,7 @@
 
 int main()
 {
-    FRAMEWORK.Init(1280, 720, "TITLE!!");
+    FRAMEWORK.Init(1080, 720, "SFML_Gardenscapes_KHI");
     FRAMEWORK.Do();
     FRAMEWORK.Release();
 
