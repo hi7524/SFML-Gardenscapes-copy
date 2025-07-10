@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "SceneDev2.h"
 #include "TextGo.h"
-#include "AniPlayer.h"
 
 SceneDev2::SceneDev2() 
 	: Scene(SceneIds::Dev2)
