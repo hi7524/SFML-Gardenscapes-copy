@@ -40,4 +40,6 @@ public:
 	void SlotSetting();
 	int To1D(int i, int j);
 	void SpawnObject(sf::Vector2f spawnPos);
+	void DragObj();
+	void SwapObjs(float dt);
 };

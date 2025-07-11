@@ -45,7 +45,6 @@ void Object::Init()
 	sortingLayer = SortingLayers::Default;
 	sortingOrder = 0;
 
-	//std::cout << (int)sortingLayer << std::endl;
 	object.setTexture(TEXTURE_MGR.Get(texId));
 }
 
@@ -55,11 +54,8 @@ void Object::Release()
 
 void Object::Reset()
 {
-
 	SetRandomType();
 	object.setTexture(TEXTURE_MGR.Get(texId));
-	std::cout << (int)objectType << std::endl;
-
 
 	Utils::SetOrigin(object, Origins::MC);
 }
