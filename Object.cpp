@@ -28,6 +28,7 @@ void Object::SetOrigin(const sf::Vector2f& o)
 {
 	GameObject::SetOrigin(o);
 	object.setOrigin(o);
+
 }
 
 void Object::SetOrigin(Origins preset)
@@ -41,6 +42,9 @@ void Object::SetOrigin(Origins preset)
 
 void Object::Init()
 {
+	sortingLayer = SortingLayers::Default;
+	sortingOrder = 0;
+
 	object.setTexture(TEXTURE_MGR.Get(texId));
 }
 
@@ -50,8 +54,11 @@ void Object::Release()
 
 void Object::Reset()
 {
-	SetItemType();
+
+	SetRandomType();
 	object.setTexture(TEXTURE_MGR.Get(texId));
+	std::cout << (int)objectType << std::endl;
+
 
 	Utils::SetOrigin(object, Origins::MC);
 }
@@ -69,39 +76,39 @@ void Object::Draw(sf::RenderWindow& window)
 }
 
 // 아이템 타입 랜덤 설정
-void Object::SetItemType()
+void Object::SetRandomType()
 {
-	int random = Utils::RandomRange(0, (int)ItemType::Count);
+	int random = Utils::RandomRange(0, (int)ObjectType::Count);
 
-	switch ((ItemType)random)
+	switch ((ObjectType)random)
 	{
-	case ItemType::Diamond:
-		itemType = ItemType::Diamond;
+	case ObjectType::Diamond:
+		objectType = ObjectType::Diamond;
 		texId = "graphics/diamond.png";
 		break;
 
-	case ItemType::Cookie:
-		itemType = ItemType::Cookie;
+	case ObjectType::Cookie:
+		objectType = ObjectType::Cookie;
 		texId = "graphics/cookie.png";
 		break;
 
-	case ItemType::Redstone:
-		itemType = ItemType::Redstone;
+	case ObjectType::Redstone:
+		objectType = ObjectType::Redstone;
 		texId = "graphics/redstone.png";
 		break;
 
-	case ItemType::Lava:
-		itemType = ItemType::Lava;
+	case ObjectType::Lava:
+		objectType = ObjectType::Lava;
 		texId = "graphics/lava.png";
 		break;
 
-	case ItemType::Potato:
-		itemType = ItemType::Potato;
+	case ObjectType::Potato:
+		objectType = ObjectType::Potato;
 		texId = "graphics/potato.png";
 		break;
 
 	default:
-		itemType = ItemType::None;
+		objectType = ObjectType::None;
 		break;
 	}
 }

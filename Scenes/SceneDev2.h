@@ -23,8 +23,9 @@ protected:
 	Slot* slots[49];
 	Object* object;
 
-	std::list<Object*> objectPool;
+	std::vector<Object*> objectPool;
 
+	Object* selectedObj = nullptr;
 	//sf::Vector2f slotCenterPos[7][7];
 
 public:

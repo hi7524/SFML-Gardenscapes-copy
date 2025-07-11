@@ -37,15 +37,20 @@ void SceneDev2::Enter()
 	TEXTURE_MGR.Load("graphics/potato.png");
 
 	// 슬롯 생성 및 배치
-	SlotSetting();
+	objectPool.resize(49);
+	
 
 	// 오브젝트 생성
-	for (int i = 0; i < 50; ++i)
-	{
-		Object* object = (Object*)AddGameObject(new Object());
-		object->SetActive(false);
-		objectPool.push_back(object);
-	}
+	//for (int i = 0; i < 49; ++i)
+	//{
+	//	Object* object = (Object*)AddGameObject(new Object());
+	//	object->Init();
+	//	object->Reset();
+	//	object->SetActive(true);
+	//	objectPool[i] = object;
+	//}
+
+	SlotSetting();
 
 	//object = (Object*)AddGameObject(new Object());
 	//object->SetPosition(slots[To1D(2, 3)]->GetPosition());
@@ -57,7 +62,36 @@ void SceneDev2::Enter()
 
 void SceneDev2::Update(float dt)
 {
+	//::cout << InputMgr::GetMousePosition().x << ", " << InputMgr::GetMousePosition().y << std::endl;
+	//std::cout << objectPool[1]->GetGlobalBounds().left << std::endl;
+	//std::cout << objectPool[1]->GetGlobalBounds().left + objectPool[1]->GetGlobalBounds().width << std::endl;
+	//std::cout << InputMgr::GetMousePosition().x << std::endl;
+
+	
+	for (int i = 0; i < 49; i++)
+	{
+		if (objectPool[i] != nullptr)
+		{
+			if ((objectPool[i]->GetGlobalBounds().left <= InputMgr::GetMousePosition().x && InputMgr::GetMousePosition().x <= objectPool[i]->GetGlobalBounds().left + objectPool[i]->GetGlobalBounds().width)
+				&& (objectPool[i]->GetGlobalBounds().top <= InputMgr::GetMousePosition().y && InputMgr::GetMousePosition().y <= objectPool[i]->GetGlobalBounds().top + objectPool[i]->GetGlobalBounds().height))
+			{
+				//std::cout << " ssss" << std::endl;
+				std::cout << (int)objectPool[i]->GetItemType() << std::endl;
+
+				if (InputMgr::GetMouseButton(sf::Mouse::Left))
+				{
+
+					objectPool[i]->SetPosition((sf::Vector2f)InputMgr::GetMousePosition());
+				}
+			}
+		}
+
+	}
+
+
+
 	Scene::Update(dt);
+
 }
 
 void SceneDev2::Draw(sf::RenderWindow& window)
@@ -86,9 +120,27 @@ void SceneDev2::SlotSetting()
 			{
 				slots[To1D(i, j)] = (Slot*)AddGameObject(new Slot());
 				slots[To1D(i, j)]->SetPosition({ startPos.x + j * slotSize.x, startPos.y + i * slotSize.y });
-				SpawnObject(slots[To1D(i, j)]->GetPosition());
+
+				sf::Vector2f testVec = slots[To1D(i, j)]->GetPosition();
+
+				Object* object = (Object*)AddGameObject(new Object());
+				object->Init();
+				object->Reset();
+				object->SetActive(true);
+				objectPool[To1D(i, j)] = object;
+
+				objectPool[To1D(i, j)]->SetPosition(slots[To1D(i, j)]->GetPosition());
+				//td::cout << (int)objectPool[To1D(i, j)]->GetItemType() << " ";
+			}
+			else
+			{
+				std::cout << "X ";
+				objectPool[To1D(i, j)] = nullptr;
+
 			}
 		}
+		std::cout << std::endl;
+		std::cout << "-------------------" << std::endl;
 	}
 
 	//for (int i = 0; i < 7; i++)
@@ -116,18 +168,20 @@ void SceneDev2::SpawnObject(sf::Vector2f spawnPos)
 
 	for (Object* obj : objectPool)
 	{
-		// 비활성화 되어있는 오브젝트 사용
-		if (!obj->GetActive())
-		{
-			obj->Reset();
-			obj->SetActive(true);
-			obj->SetPosition(spawnPos);
-			return;
-		}
-		else
-		{
-			activeObjCount++;
-		}
+		//// 비활성화 되어있는 오브젝트 사용
+		//if (!obj->GetActive())
+		//{
+		//	obj->Reset();
+		//	obj->SetActive(true);
+		//	obj->SetPosition(spawnPos);
+		//	return;
+		//}
+		//else
+		//{
+		//	activeObjCount++;
+		//}
+
+		
 	}
 
 	// 오브젝트 안의 모든 요소가 사용중일 때 새로 만들어 사용

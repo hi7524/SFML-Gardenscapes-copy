@@ -32,3 +32,14 @@ enum class Sides
 	Right,
 	None,
 };
+
+enum class ObjectType
+{
+	None = -1,
+	Diamond, // 0
+	Cookie,  // 1
+	Redstone, // 2
+	Lava, // 3
+	Potato, // 4 
+	Count
+};

@@ -41,6 +41,8 @@ void Slot::SetOrigin(Origins preset)
 
 void Slot::Init()
 {
+    sortingLayer = SortingLayers::Background;
+	sortingOrder = 0;
 }
 
 void Slot::Release()

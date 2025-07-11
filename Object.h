@@ -4,20 +4,9 @@
 class Object : public GameObject
 {
 protected:
-	enum class ItemType
-	{
-		None = -1,
-		Diamond,
-		Cookie,
-		Redstone,
-		Lava,
-		Potato,
-		Count
-	};
-
 	sf::Sprite object;
 	std::string texId = "graphics/diamond.png";
-	ItemType itemType = ItemType::None;
+	ObjectType objectType = ObjectType::None;
 	bool isActive = true;
 
 public:
@@ -36,7 +25,15 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
-	void SetItemType();
+	void SetRandomType();
+	void SetType(ObjectType objType) { objectType = objType; }
+	ObjectType GetItemType() const { return objectType; }
 	void SetActive(bool active) { isActive = active; }
 	bool GetActive() { return isActive; }
+
+	sf::FloatRect GetGlobalBounds() const override
+	{
+		return object.getGlobalBounds();
+	}
+
 };
