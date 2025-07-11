@@ -75,17 +75,23 @@ void SceneDev2::Update(float dt)
 			if ((objectPool[i]->GetGlobalBounds().left <= InputMgr::GetMousePosition().x && InputMgr::GetMousePosition().x <= objectPool[i]->GetGlobalBounds().left + objectPool[i]->GetGlobalBounds().width)
 				&& (objectPool[i]->GetGlobalBounds().top <= InputMgr::GetMousePosition().y && InputMgr::GetMousePosition().y <= objectPool[i]->GetGlobalBounds().top + objectPool[i]->GetGlobalBounds().height))
 			{
-				//std::cout << " ssss" << std::endl;
-				std::cout << (int)objectPool[i]->GetItemType() << std::endl;
 
-				if (InputMgr::GetMouseButton(sf::Mouse::Left))
+				if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
 				{
+					selectedObj = objectPool[i];
+				}
 
+				if (InputMgr::GetMouseButtonUp(sf::Mouse::Left))
+				{
+					selectedObj = nullptr;
+				}
+
+				if ((InputMgr::GetMouseButton(sf::Mouse::Left) && selectedObj == objectPool[i]))
+				{
 					objectPool[i]->SetPosition((sf::Vector2f)InputMgr::GetMousePosition());
 				}
 			}
 		}
-
 	}
 
 
