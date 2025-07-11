@@ -28,11 +28,27 @@ void SceneDev2::Init()
 
 void SceneDev2::Enter()
 {
+	// 리소스 설정
+	TEXTURE_MGR.Load("graphics/slot.png");
+	TEXTURE_MGR.Load("graphics/diamond.png");
+	TEXTURE_MGR.Load("graphics/cookie.png");
+	TEXTURE_MGR.Load("graphics/redstone.png");
+	TEXTURE_MGR.Load("graphics/lava.png");
+	TEXTURE_MGR.Load("graphics/potato.png");
+
 	// 슬롯 생성 및 배치
 	SlotSetting();
 
-	object = (Object*)AddGameObject(new Object());
-	object->SetPosition(slots[13]->GetPosition());
+	// 오브젝트 생성
+	for (int i = 0; i < 50; ++i)
+	{
+		Object* object = (Object*)AddGameObject(new Object());
+		object->SetActive(false);
+		objectPool.push_back(object);
+	}
+
+	//object = (Object*)AddGameObject(new Object());
+	//object->SetPosition(slots[To1D(2, 3)]->GetPosition());
 	//slots[17]->SetContainObj(true); // 그 위치에 아이템 있다고 알리는 bool 변수 세팅할 것
 	// 그리고 해당 slot이 유효한 슬롯인지 검사하고 아이템 놓기
 
@@ -46,16 +62,12 @@ void SceneDev2::Update(float dt)
 
 void SceneDev2::Draw(sf::RenderWindow& window)
 {
-
 	Scene::Draw(window);
 }
 
-// 슬롯 생성
+// 초기 슬롯 생성
 void SceneDev2::SlotSetting()
 {
-	// 리소스 설정
-	TEXTURE_MGR.Load("graphics/slot.png");
-
 	// 슬롯 배치를 위한 크기 계산
 	sf::Vector2u slotSize = TEXTURE_MGR.Get("graphics/slot.png").getSize();
 
@@ -72,14 +84,60 @@ void SceneDev2::SlotSetting()
 		{
 			if (mapList[i][j])
 			{
-				slots[i * 7 + j] = (Slot*)AddGameObject(new Slot());
-				slots[i * 7 + j]->SetPosition({ startPos.x + j * slotSize.x, startPos.y + i * slotSize.y });
-				slotCenterPos[i][j] = { startPos.x + j * slotSize.x, startPos.y + i * slotSize.y };
-			}
-			else
-			{
-				slotCenterPos[i][j] = { 0.f, 0.f };
+				slots[To1D(i, j)] = (Slot*)AddGameObject(new Slot());
+				slots[To1D(i, j)]->SetPosition({ startPos.x + j * slotSize.x, startPos.y + i * slotSize.y });
+				SpawnObject(slots[To1D(i, j)]->GetPosition());
 			}
 		}
+	}
+
+	//for (int i = 0; i < 7; i++)
+	//{
+	//	for (int j = 0; j < 7; j++)
+	//	{
+	//		if (slots[To1D(i, j)] != nullptr)
+	//		{
+	//			std::cout << slots[To1D(i, j)]->GetPosition().x << std::endl;
+	//		}
+	//	}
+	//}
+}
+
+// 2차원 배열 1차원 배열로 변경
+int SceneDev2::To1D(int i, int j)
+{
+	return i * 7 + j;
+}
+
+// 오브젝트 생성 및 사용
+void SceneDev2::SpawnObject(sf::Vector2f spawnPos)
+{
+	int activeObjCount = 0;
+
+	for (Object* obj : objectPool)
+	{
+		// 비활성화 되어있는 오브젝트 사용
+		if (!obj->GetActive())
+		{
+			obj->Reset();
+			obj->SetActive(true);
+			obj->SetPosition(spawnPos);
+			return;
+		}
+		else
+		{
+			activeObjCount++;
+		}
+	}
+
+	// 오브젝트 안의 모든 요소가 사용중일 때 새로 만들어 사용
+	if (activeObjCount == objectPool.size())
+	{
+		Object* obj;
+		obj = (Object*)AddGameObject(new Object());
+		obj->Init();
+		obj->Reset();
+		objectPool.push_back(obj);
+		obj->SetPosition(spawnPos);
 	}
 }

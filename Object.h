@@ -16,8 +16,9 @@ protected:
 	};
 
 	sf::Sprite object;
-	std::string texId;
+	std::string texId = "graphics/diamond.png";
 	ItemType itemType = ItemType::None;
+	bool isActive = true;
 
 public:
 	Object(const std::string& name = "");
@@ -36,4 +37,6 @@ public:
 	void Draw(sf::RenderWindow& window) override;
 
 	void SetItemType();
+	void SetActive(bool active) { isActive = active; }
+	bool GetActive() { return isActive; }
 };

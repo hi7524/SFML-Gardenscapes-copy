@@ -41,6 +41,7 @@ void Object::SetOrigin(Origins preset)
 
 void Object::Init()
 {
+	object.setTexture(TEXTURE_MGR.Get(texId));
 }
 
 void Object::Release()
@@ -61,13 +62,16 @@ void Object::Update(float dt)
 
 void Object::Draw(sf::RenderWindow& window)
 {
-	window.draw(object);
+	if (isActive)
+	{
+		window.draw(object);
+	}
 }
 
 // 아이템 타입 랜덤 설정
 void Object::SetItemType()
 {
-	int random = Utils::RandomRange(1, (int)ItemType::Count);
+	int random = Utils::RandomRange(0, (int)ItemType::Count);
 
 	switch ((ItemType)random)
 	{

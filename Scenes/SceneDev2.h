@@ -8,7 +8,7 @@ class SceneDev2 : public Scene
 {
 protected:
 
-	// 1스테이지 맵 모양 (이 모양에 맞추어 슬롯이 그려짐)
+	// 1스테이지 맵 모양
 	int mapList[7][7] =
 	{
 		{0, 1, 1, 1, 1, 1, 0},
@@ -23,8 +23,9 @@ protected:
 	Slot* slots[49];
 	Object* object;
 
+	std::list<Object*> objectPool;
 
-	sf::Vector2f slotCenterPos[7][7];
+	//sf::Vector2f slotCenterPos[7][7];
 
 public:
 	SceneDev2();
@@ -36,4 +37,6 @@ public:
 	void Draw(sf::RenderWindow& window) override;
 
 	void SlotSetting();
+	int To1D(int i, int j);
+	void SpawnObject(sf::Vector2f spawnPos);
 };
