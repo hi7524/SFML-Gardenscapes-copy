@@ -45,6 +45,7 @@ void Object::Init()
 	sortingLayer = SortingLayers::Default;
 	sortingOrder = 0;
 
+	//std::cout << (int)sortingLayer << std::endl;
 	object.setTexture(TEXTURE_MGR.Get(texId));
 }
 

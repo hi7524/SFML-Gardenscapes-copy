@@ -94,10 +94,7 @@ void SceneDev2::Update(float dt)
 		}
 	}
 
-
-
 	Scene::Update(dt);
-
 }
 
 void SceneDev2::Draw(sf::RenderWindow& window)
@@ -118,6 +115,7 @@ void SceneDev2::SlotSetting()
 	// 화면 중앙 위치
 	sf::Vector2f startPos = FRAMEWORK.GetWindowSizeF() * 0.5f - (totalSize * 0.5f);
 
+	// 슬롯 생성
 	for (int i = 0; i < 7; i++)
 	{
 		for (int j = 0; j < 7; j++)
@@ -126,9 +124,17 @@ void SceneDev2::SlotSetting()
 			{
 				slots[To1D(i, j)] = (Slot*)AddGameObject(new Slot());
 				slots[To1D(i, j)]->SetPosition({ startPos.x + j * slotSize.x, startPos.y + i * slotSize.y });
+			}
+		}
+	}
 
-				sf::Vector2f testVec = slots[To1D(i, j)]->GetPosition();
-
+	// Object 생성
+	for (int i = 0; i < 7; i++)
+	{
+		for (int j = 0; j < 7; j++)
+		{
+			if (mapList[i][j])
+			{
 				Object* object = (Object*)AddGameObject(new Object());
 				object->Init();
 				object->Reset();
@@ -136,17 +142,13 @@ void SceneDev2::SlotSetting()
 				objectPool[To1D(i, j)] = object;
 
 				objectPool[To1D(i, j)]->SetPosition(slots[To1D(i, j)]->GetPosition());
-				//td::cout << (int)objectPool[To1D(i, j)]->GetItemType() << " ";
 			}
 			else
 			{
-				std::cout << "X ";
 				objectPool[To1D(i, j)] = nullptr;
-
 			}
 		}
 		std::cout << std::endl;
-		std::cout << "-------------------" << std::endl;
 	}
 
 	//for (int i = 0; i < 7; i++)
