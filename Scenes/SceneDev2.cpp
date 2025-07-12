@@ -3,7 +3,6 @@
 #include "Slot.h"
 #include "Object.h"
 
-
 sf::Vector2f originVec = { 0.f, 0.f };
 
 SceneDev2::SceneDev2() 
@@ -31,16 +30,9 @@ void SceneDev2::Init()
 
 void SceneDev2::Enter()
 {
-	// 리소스 설정
-	TEXTURE_MGR.Load("graphics/slot.png");
-	TEXTURE_MGR.Load("graphics/diamond.png");
-	TEXTURE_MGR.Load("graphics/cookie.png");
-	TEXTURE_MGR.Load("graphics/redstone.png");
-	TEXTURE_MGR.Load("graphics/lava.png");
-	TEXTURE_MGR.Load("graphics/potato.png");
-
+	Scene::Enter();
 	// 슬롯 생성 및 배치
-	objectPool.resize(49);
+	//objectPool.resize(49);
 	
 
 	// 오브젝트 생성
@@ -52,24 +44,26 @@ void SceneDev2::Enter()
 	//	object->SetActive(true);
 	//	objectPool[i] = object;
 	//}
+	TEXTURE_MGR.Load("graphics/slot.png");
+	CreateSlots(); // 초기 슬롯 생성
+	CreateObjs(); // 초기 오브젝트 생성
 
-	SlotSetting();
-	
 
-
-	Scene::Enter();
 }
 
 void SceneDev2::Update(float dt)
 {
-	//::cout << InputMgr::GetMousePosition().x << ", " << InputMgr::GetMousePosition().y << std::endl;
-	//std::cout << objectPool[1]->GetGlobalBounds().left << std::endl;
-	//std::cout << objectPool[1]->GetGlobalBounds().left + objectPool[1]->GetGlobalBounds().width << std::endl;
-	//std::cout << InputMgr::GetMousePosition().x << std::endl;
+	//DragObj();
+	//SwapObjs(dt);
+	MouseOnObj();
 
-	
-	DragObj();
-	SwapObjs(dt);
+	// 두개 모두 선택한 경우
+	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
+	{
+		std::cout << selectedObj1 << std::endl;
+		std::cout << selectedObj2 << std::endl;
+	}
+
 	Scene::Update(dt);
 }
 
@@ -79,7 +73,7 @@ void SceneDev2::Draw(sf::RenderWindow& window)
 }
 
 // 초기 슬롯 생성
-void SceneDev2::SlotSetting()
+void SceneDev2::CreateSlots()
 {
 	// 슬롯 배치를 위한 크기 계산
 	sf::Vector2u slotSize = TEXTURE_MGR.Get("graphics/slot.png").getSize();
@@ -98,13 +92,18 @@ void SceneDev2::SlotSetting()
 		{
 			if (mapList[i][j])
 			{
-				slots[To1D(i, j)] = (Slot*)AddGameObject(new Slot());
-				slots[To1D(i, j)]->SetPosition({ startPos.x + j * slotSize.x, startPos.y + i * slotSize.y });
+				slots[i][j] = (Slot*)AddGameObject(new Slot());
+				slots[i][j]->Init();
+				slots[i][j]->Reset();
+				slots[i][j]->SetPosition({ startPos.x + j * slotSize.x, startPos.y + i * slotSize.y });
 			}
 		}
 	}
+}
 
-	// Object 생성
+// 오브젝트 생성
+void SceneDev2::CreateObjs()
+{
 	for (int i = 0; i < 7; i++)
 	{
 		for (int j = 0; j < 7; j++)
@@ -115,136 +114,153 @@ void SceneDev2::SlotSetting()
 				object->Init();
 				object->Reset();
 				object->SetActive(true);
-				objectPool[To1D(i, j)] = object;
-
-				objectPool[To1D(i, j)]->SetPosition(slots[To1D(i, j)]->GetPosition());
-			}
-			else
-			{
-				objectPool[To1D(i, j)] = nullptr;
+				object->SetPosition(slots[i][j]->GetPosition());
+				objectGrid[i][j] = object;
+				
 			}
 		}
-		std::cout << std::endl;
 	}
-
-	//for (int i = 0; i < 7; i++)
-	//{
-	//	for (int j = 0; j < 7; j++)
-	//	{
-	//		if (slots[To1D(i, j)] != nullptr)
-	//		{
-	//			std::cout << slots[To1D(i, j)]->GetPosition().x << std::endl;
-	//		}
-	//	}
-	//}
 }
+
+// 오브젝트 선택
+void SceneDev2::MouseOnObj()
+{
+	for (int i = 0; i < 7; i++)
+	{
+		for (int j = 0; j < 7; j++)
+		{
+			if (objectGrid[i][j] != nullptr)
+			{
+				if ((objectGrid[i][j]->GetGlobalBounds().left <= InputMgr::GetMousePosition().x && InputMgr::GetMousePosition().x <= objectGrid[i][j]->GetGlobalBounds().left + objectGrid[i][j]->GetGlobalBounds().width)
+					&& (objectGrid[i][j]->GetGlobalBounds().top <= InputMgr::GetMousePosition().y && InputMgr::GetMousePosition().y <= objectGrid[i][j]->GetGlobalBounds().top + objectGrid[i][j]->GetGlobalBounds().height))
+				{
+
+					if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
+					{
+						if (selectedObj1 == nullptr)
+						{
+							selectedObj1 = objectGrid[i][j];
+							return;
+						}
+
+						if (selectedObj1 != nullptr && selectedObj2 == nullptr)
+						{
+							selectedObj2 = objectGrid[i][j];
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// 오브젝트 생성 및 사용
+//void SceneDev2::SpawnObject(sf::Vector2f spawnPos)
+//{
+//	int activeObjCount = 0;
+//
+//	//for (Object* obj : objectPool)
+//	//{
+//	//	//// 비활성화 되어있는 오브젝트 사용
+//	//	//if (!obj->GetActive())
+//	//	//{
+//	//	//	obj->Reset();
+//	//	//	obj->SetActive(true);
+//	//	//	obj->SetPosition(spawnPos);
+//	//	//	return;
+//	//	//}
+//	//	//else
+//	//	//{
+//	//	//	activeObjCount++;
+//	//	//}
+//
+//	//	
+//	//}
+//
+//	// 오브젝트 안의 모든 요소가 사용중일 때 새로 만들어 사용
+//	/*if (activeObjCount == objectPool.size())
+//	{
+//		Object* obj;
+//		obj = (Object*)AddGameObject(new Object());
+//		obj->Init();
+//		obj->Reset();
+//		objectPool.push_back(obj);
+//		obj->SetPosition(spawnPos);
+//	}*/
+//}
+
+
+
+// 오브젝트 드래그
+//void SceneDev2::DragObj()
+//{
+//	sf::Vector2f originalPos = { 0.f, 0.f };
+//
+//	for (int i = 0; i < 49; i++)
+//	{
+//		if (objectPool[i] != nullptr)
+//		{
+//			if ((objectPool[i]->GetGlobalBounds().left <= InputMgr::GetMousePosition().x && InputMgr::GetMousePosition().x <= objectPool[i]->GetGlobalBounds().left + objectPool[i]->GetGlobalBounds().width)
+//				&& (objectPool[i]->GetGlobalBounds().top <= InputMgr::GetMousePosition().y && InputMgr::GetMousePosition().y <= objectPool[i]->GetGlobalBounds().top + objectPool[i]->GetGlobalBounds().height))
+//			{
+//
+//				if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
+//				{
+//					selectedObj = objectPool[i];
+//					originalPos = selectedObj->GetPosition();
+//				}
+//
+//				if (InputMgr::GetMouseButtonUp(sf::Mouse::Left))
+//				{
+//					selectedObj = nullptr;
+//				}
+//
+//				if ((InputMgr::GetMouseButton(sf::Mouse::Left) && selectedObj == objectPool[i]))
+//				{
+//
+//					//if (originalPos )
+//
+//					objectPool[i]->SetPosition({ (float)InputMgr::GetMousePosition().x, objectPool[i]->GetPosition().y });
+//				}
+//			}
+//		}
+//	}
+//}
+
+// 변경
+//void SceneDev2::SwapObjs(float dt)
+//{
+//	bool isMove = false;
+//
+//	if (originVec.x == 0.f && originVec.y == 0.f)
+//	{
+//		originVec = objectPool[1]->GetPosition();
+//		std::cout << "저장함: " << std::to_string(originVec.x) << ", " << std::to_string(originVec.y) << std::endl;
+//	}
+//
+//	//std::cout << std::to_string(originVec.x) << std::endl;
+//	if (objectPool[1]->GetPosition().x >= originVec.x + 32 && objectPool[2]->GetPosition().x != objectPool[1]->GetPosition().x)
+//	{
+//		sf::Vector2f vec = objectPool[1]->GetPosition();
+//		
+//		objectPool[1]->SetPosition({ objectPool[1]->GetPosition().x + 1.f * 80 * dt, originVec.y });
+//
+//		if ((float)Utils::Distance(objectPool[1]->GetPosition(), objectPool[2]->GetPosition()) <= 1.f)
+//		{
+//			objectPool[1]->SetPosition(objectPool[2]->GetPosition());
+//		}
+//		//objectPool[1]->SetPosition(slots[2]->GetPosition());
+//	}
+//	
+//	if (InputMgr::GetMouseButtonUp(sf::Mouse::Left) && objectPool[1]->GetPosition().x <= originVec.x + 20)
+//	{
+//		objectPool[1]->SetPosition(originVec);
+//	}
+//}
 
 // 2차원 배열 1차원 배열로 변경
 int SceneDev2::To1D(int i, int j)
 {
 	return i * 7 + j;
-}
-
-// 오브젝트 생성 및 사용
-void SceneDev2::SpawnObject(sf::Vector2f spawnPos)
-{
-	int activeObjCount = 0;
-
-	for (Object* obj : objectPool)
-	{
-		//// 비활성화 되어있는 오브젝트 사용
-		//if (!obj->GetActive())
-		//{
-		//	obj->Reset();
-		//	obj->SetActive(true);
-		//	obj->SetPosition(spawnPos);
-		//	return;
-		//}
-		//else
-		//{
-		//	activeObjCount++;
-		//}
-
-		
-	}
-
-	// 오브젝트 안의 모든 요소가 사용중일 때 새로 만들어 사용
-	if (activeObjCount == objectPool.size())
-	{
-		Object* obj;
-		obj = (Object*)AddGameObject(new Object());
-		obj->Init();
-		obj->Reset();
-		objectPool.push_back(obj);
-		obj->SetPosition(spawnPos);
-	}
-}
-
-// 오브젝트 드래그
-void SceneDev2::DragObj()
-{
-	sf::Vector2f originalPos = { 0.f, 0.f };
-
-	for (int i = 0; i < 49; i++)
-	{
-		if (objectPool[i] != nullptr)
-		{
-			if ((objectPool[i]->GetGlobalBounds().left <= InputMgr::GetMousePosition().x && InputMgr::GetMousePosition().x <= objectPool[i]->GetGlobalBounds().left + objectPool[i]->GetGlobalBounds().width)
-				&& (objectPool[i]->GetGlobalBounds().top <= InputMgr::GetMousePosition().y && InputMgr::GetMousePosition().y <= objectPool[i]->GetGlobalBounds().top + objectPool[i]->GetGlobalBounds().height))
-			{
-
-				if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
-				{
-					selectedObj = objectPool[i];
-					originalPos = selectedObj->GetPosition();
-				}
-
-				if (InputMgr::GetMouseButtonUp(sf::Mouse::Left))
-				{
-					selectedObj = nullptr;
-				}
-
-				if ((InputMgr::GetMouseButton(sf::Mouse::Left) && selectedObj == objectPool[i]))
-				{
-
-					//if (originalPos )
-
-					objectPool[i]->SetPosition({ (float)InputMgr::GetMousePosition().x, objectPool[i]->GetPosition().y });
-				}
-			}
-		}
-	}
-}
-
-// 변경
-void SceneDev2::SwapObjs(float dt)
-{
-	bool isMove = false;
-
-	if (originVec.x == 0.f && originVec.y == 0.f)
-	{
-		originVec = objectPool[1]->GetPosition();
-		std::cout << "저장함: " << std::to_string(originVec.x) << ", " << std::to_string(originVec.y) << std::endl;
-	}
-
-	//std::cout << std::to_string(originVec.x) << std::endl;
-	if (objectPool[1]->GetPosition().x >= originVec.x + 32 && objectPool[2]->GetPosition().x != objectPool[1]->GetPosition().x)
-	{
-		sf::Vector2f vec = objectPool[1]->GetPosition();
-		
-		objectPool[1]->SetPosition({ objectPool[1]->GetPosition().x + 1.f * 80 * dt, originVec.y });
-
-		if ((float)Utils::Distance(objectPool[1]->GetPosition(), objectPool[2]->GetPosition()) <= 1.f)
-		{
-			objectPool[1]->SetPosition(objectPool[2]->GetPosition());
-		}
-		//objectPool[1]->SetPosition(slots[2]->GetPosition());
-	}
-	
-	if (InputMgr::GetMouseButtonUp(sf::Mouse::Left) && objectPool[1]->GetPosition().x <= originVec.x + 20)
-	{
-		objectPool[1]->SetPosition(originVec);
-	}
-	
-	
 }

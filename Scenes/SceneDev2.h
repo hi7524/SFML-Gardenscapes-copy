@@ -20,13 +20,16 @@ protected:
 		{0, 1, 1, 1, 1, 1, 0},
 	};
 
-	Slot* slots[49];
+	Slot* slots[7][7] = {nullptr};
 	Object* object;
 
-	std::vector<Object*> objectPool;
-
-	Object* selectedObj = nullptr;
+	//std::vector<Object*> objectPool = { nullptr };
+	Object* objectGrid[7][7] = { nullptr };
+	//Object* selectedObj = nullptr;
 	//sf::Vector2f slotCenterPos[7][7];
+
+	Object* selectedObj1 = nullptr; // 교환할 두 오브젝트 1
+	Object* selectedObj2 = nullptr; // 교환할 두 오브젝트 1
 
 public:
 	SceneDev2();
@@ -37,9 +40,11 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
-	void SlotSetting();
+	void CreateSlots();
 	int To1D(int i, int j);
+	void CreateObjs();
 	void SpawnObject(sf::Vector2f spawnPos);
-	void DragObj();
-	void SwapObjs(float dt);
+	void MouseOnObj();
+	//void DragObj();
+	//void SwapObjs(float dt);
 };
