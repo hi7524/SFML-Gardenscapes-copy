@@ -47,8 +47,6 @@ void SceneDev2::Enter()
 	TEXTURE_MGR.Load("graphics/slot.png");
 	CreateSlots(); // 초기 슬롯 생성
 	CreateObjs(); // 초기 오브젝트 생성
-
-
 }
 
 void SceneDev2::Update(float dt)
@@ -60,8 +58,7 @@ void SceneDev2::Update(float dt)
 	// 두개 모두 선택한 경우
 	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
 	{
-		std::cout << selectedObj1 << std::endl;
-		std::cout << selectedObj2 << std::endl;
+		MoveObjPos();
 	}
 
 	Scene::Update(dt);
@@ -70,6 +67,18 @@ void SceneDev2::Update(float dt)
 void SceneDev2::Draw(sf::RenderWindow& window)
 {
 	Scene::Draw(window);
+}
+
+void SceneDev2::MoveObjPos()
+{
+	selectedObj1Pos = selectedObj1->GetPosition();
+	selectedObj2Pos = selectedObj2->GetPosition();
+
+	selectedObj1->SetPosition(selectedObj2Pos);
+	selectedObj2->SetPosition(selectedObj1Pos);
+
+	selectedObj1 = nullptr;
+	selectedObj2 = nullptr;
 }
 
 // 초기 슬롯 생성
