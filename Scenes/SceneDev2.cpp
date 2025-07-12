@@ -31,20 +31,7 @@ void SceneDev2::Init()
 void SceneDev2::Enter()
 {
 	Scene::Enter();
-	// 슬롯 생성 및 배치
-	//objectPool.resize(49);
-	
 
-	// 오브젝트 생성
-	//for (int i = 0; i < 49; ++i)
-	//{
-	//	Object* object = (Object*)AddGameObject(new Object());
-	//	object->Init();
-	//	object->Reset();
-	//	object->SetActive(true);
-	//	objectPool[i] = object;
-	//}
-	TEXTURE_MGR.Load("graphics/slot.png");
 	CreateSlots(); // 초기 슬롯 생성
 	CreateObjs(); // 초기 오브젝트 생성
 }
@@ -77,7 +64,6 @@ void SceneDev2::Draw(sf::RenderWindow& window)
 	Scene::Draw(window);
 }
 
-
 // 두 오브젝트 스왑 조건 확인
 bool SceneDev2::IsSwappable(const Object* a, const Object* b)
 {
@@ -108,23 +94,30 @@ void SceneDev2::MoveObjPos(float dt)
     selectedObj1->SetPosition(nextPos1);
     selectedObj2->SetPosition(nextPos2);
 
-	// 근사치에 도달했을 경우
+	// 근사치에 도달했을 경우 정보 변경
     if (Utils::Distance(nextPos1, selectedObj2Pos) <= 0.5f && Utils::Distance(nextPos2, selectedObj1Pos) <= 0.5f)
     {
+		// 위치 설정
         selectedObj1->SetPosition(selectedObj2Pos);
         selectedObj2->SetPosition(selectedObj1Pos);
 
-        std::swap(selectedObj1, selectedObj2);
+		// 오브젝트 내부의 인덱스 설정
 		sf::Vector2i index1 = selectedObj1->GetIndex();
 		sf::Vector2i index2 = selectedObj2->GetIndex();
 		selectedObj1->SetIndex(index2);
 		selectedObj2->SetIndex(index1);
 
+		// 오브젝트가 들어있는 배열의 값 교환
+		std::swap(objectGrid[index1.x][index1.y], objectGrid[index2.x][index2.y]);
+
+		// 초기화
         selectedObj1 = nullptr;
         selectedObj2 = nullptr;
-
         selectedObj1Pos = vectorZero;
         selectedObj2Pos = vectorZero;
+
+		// 매치 여부 검사
+		CheckLineMatch();
     }
 }
 
@@ -211,42 +204,85 @@ void SceneDev2::MouseOnObj()
 	}
 }
 
-// 오브젝트 생성 및 사용
-//void SceneDev2::SpawnObject(sf::Vector2f spawnPos)
-//{
-//	int activeObjCount = 0;
-//
-//	//for (Object* obj : objectPool)
-//	//{
-//	//	//// 비활성화 되어있는 오브젝트 사용
-//	//	//if (!obj->GetActive())
-//	//	//{
-//	//	//	obj->Reset();
-//	//	//	obj->SetActive(true);
-//	//	//	obj->SetPosition(spawnPos);
-//	//	//	return;
-//	//	//}
-//	//	//else
-//	//	//{
-//	//	//	activeObjCount++;
-//	//	//}
-//
-//	//	
-//	//}
-//
-//	// 오브젝트 안의 모든 요소가 사용중일 때 새로 만들어 사용
-//	/*if (activeObjCount == objectPool.size())
-//	{
-//		Object* obj;
-//		obj = (Object*)AddGameObject(new Object());
-//		obj->Init();
-//		obj->Reset();
-//		objectPool.push_back(obj);
-//		obj->SetPosition(spawnPos);
-//	}*/
-//}
+// 라인 매치 검사
+void SceneDev2::CheckLineMatch()
+{
+	// 행 검사
+	for (int i = 0; i < 7; i++)
+	{
+		int countRow = 0;
 
+		for (int j = 0; j < 6; j++)
+		{
+			if (objectGrid[i][j] == nullptr || objectGrid[i][j + 1] == nullptr)
+			{
+				if (countRow >= 2)
+				{
+					std::cout << "[가로] 3개 이상 중복" << std::endl;
+				}
+				countRow = 0;
+				continue;
+			}
 
+			if (objectGrid[i][j]->GetType() == objectGrid[i][j + 1]->GetType())
+			{
+				countRow++;
+			}
+			else
+			{
+				if (countRow >= 2)
+				{
+					std::cout << "[가로] 3개 이상 중복" << std::endl;
+				}
+				countRow = 0;
+			}
+		}
+
+		if (countRow >= 2)
+		{
+			std::cout << "[가로] 3개 이상 중복" << std::endl;
+		}
+	}
+
+	// 열 검사
+	for (int j = 0; j < 7; j++)
+	{
+		int countCol = 0;
+
+		for (int i = 0; i < 6; i++)
+		{
+			if (objectGrid[i][j] == nullptr || objectGrid[i + 1][j] == nullptr)
+			{
+				if (countCol >= 2)
+				{
+					std::cout << "[세로] 3개 이상 중복" << std::endl;
+				}
+				countCol = 0;
+				continue;
+			}
+
+			if (objectGrid[i][j]->GetType() == objectGrid[i + 1][j]->GetType())
+			{
+				countCol++;
+			}
+			else
+			{
+				if (countCol >= 2)
+				{
+					std::cout << "[세로] 3개 이상 중복" << std::endl;
+				}
+				countCol = 0;
+			}
+		}
+
+		if (countCol >= 2)
+		{
+			std::cout << "[세로] 3개 이상 중복" << std::endl;
+		}
+	}
+
+	std::cout << "---------" << std::endl;
+}
 
 // 오브젝트 드래그
 //void SceneDev2::DragObj()

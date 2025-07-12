@@ -45,6 +45,7 @@ public:
 	void CreateObjs();
 	void SpawnObject(sf::Vector2f spawnPos);
 	void MouseOnObj();
+	void CheckLineMatch();
 	//void DragObj();
 	//void SwapObjs(float dt);
 };

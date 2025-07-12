@@ -30,7 +30,7 @@ public:
 	void SetIndex(sf::Vector2i idx) { index = idx; }
 	void SetRandomType();
 	void SetType(ObjectType objType) { objectType = objType; }
-	ObjectType GetItemType() const { return objectType; }
+	ObjectType GetType() const { return objectType; }
 	void SetActive(bool active) { isActive = active; }
 	bool GetActive() { return isActive; }
 
