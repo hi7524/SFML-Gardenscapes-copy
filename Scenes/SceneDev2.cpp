@@ -58,7 +58,7 @@ void SceneDev2::Update(float dt)
 	// 두개 모두 선택한 경우
 	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
 	{
-		MoveObjPos();
+		MoveObjPos(dt);
 	}
 
 	Scene::Update(dt);
@@ -69,16 +69,35 @@ void SceneDev2::Draw(sf::RenderWindow& window)
 	Scene::Draw(window);
 }
 
-void SceneDev2::MoveObjPos()
+void SceneDev2::MoveObjPos(float dt)
 {
-	selectedObj1Pos = selectedObj1->GetPosition();
-	selectedObj2Pos = selectedObj2->GetPosition();
+	if (selectedObj1Pos == vectorZero && selectedObj2Pos == vectorZero)
+	{
+		selectedObj1Pos = selectedObj1->GetPosition();
+		selectedObj2Pos = selectedObj2->GetPosition();
+	}
 
-	selectedObj1->SetPosition(selectedObj2Pos);
-	selectedObj2->SetPosition(selectedObj1Pos);
+	sf::Vector2f dir1 = (Utils::GetNormal(selectedObj2Pos - selectedObj1->GetPosition()));
+	sf::Vector2f nextPos1 = selectedObj1->GetPosition() + dir1 * 150.f * dt;
+	selectedObj1->SetPosition(nextPos1);
 
-	selectedObj1 = nullptr;
-	selectedObj2 = nullptr;
+	sf::Vector2f dir2 = (Utils::GetNormal(selectedObj1Pos - selectedObj2->GetPosition()));
+    sf::Vector2f nextPos2 = selectedObj2->GetPosition() + dir2 * 150.f * dt;
+	selectedObj2->SetPosition(nextPos2);
+
+	// 근사치에 도달했을 경우
+	if (Utils::Distance(selectedObj1->GetPosition(), selectedObj2Pos) <= 0.5f && Utils::Distance(selectedObj2->GetPosition(), selectedObj1Pos) <= 0.5f)
+	{
+		selectedObj1->SetPosition(selectedObj2Pos);
+		selectedObj2->SetPosition(selectedObj1Pos);
+
+		std::swap(selectedObj1, selectedObj2);
+		selectedObj1 = nullptr;
+		selectedObj2 = nullptr;
+
+		selectedObj1Pos = vectorZero;
+		selectedObj2Pos = vectorZero;
+	}
 }
 
 // 초기 슬롯 생성

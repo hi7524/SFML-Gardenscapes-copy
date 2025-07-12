@@ -33,6 +33,7 @@ protected:
 
 	sf::Vector2f selectedObj1Pos = { 0.f, 0.f };
 	sf::Vector2f selectedObj2Pos = { 0.f, 0.f };
+	sf::Vector2f vectorZero = { 0.f, 0.f };
 
 public:
 	SceneDev2();
@@ -43,7 +44,7 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
-	void MoveObjPos();
+	void MoveObjPos(float dt);
 
 	void CreateSlots();
 	int To1D(int i, int j);
