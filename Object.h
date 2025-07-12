@@ -8,6 +8,7 @@ protected:
 	std::string texId = "graphics/diamond.png";
 	ObjectType objectType = ObjectType::None;
 	bool isActive = true;
+	sf::Vector2i index = { -1, -1 }; // 현재 저장되어있는 인덱스를 저장할 변수, 위치 아님
 
 public:
 	Object(const std::string& name = "");
@@ -25,6 +26,8 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
+	sf::Vector2i GetIndex() const { return index; }
+	void SetIndex(sf::Vector2i idx) { index = idx; }
 	void SetRandomType();
 	void SetType(ObjectType objType) { objectType = objType; }
 	ObjectType GetItemType() const { return objectType; }

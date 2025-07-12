@@ -7,7 +7,6 @@ class Object;
 class SceneDev2 : public Scene
 {
 protected:
-
 	// 1스테이지 맵 모양
 	int mapList[7][7] =
 	{
@@ -21,12 +20,7 @@ protected:
 	};
 
 	Slot* slots[7][7] = {nullptr};
-	Object* object;
-
-	//std::vector<Object*> objectPool = { nullptr };
 	Object* objectGrid[7][7] = { nullptr };
-	//Object* selectedObj = nullptr;
-	//sf::Vector2f slotCenterPos[7][7];
 
 	Object* selectedObj1 = nullptr; // 교환할 두 오브젝트 1
 	Object* selectedObj2 = nullptr; // 교환할 두 오브젝트 1
@@ -44,8 +38,8 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
+	bool IsSwappable(const Object* a, const Object* b);
 	void MoveObjPos(float dt);
-
 	void CreateSlots();
 	int To1D(int i, int j);
 	void CreateObjs();

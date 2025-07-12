@@ -58,7 +58,15 @@ void SceneDev2::Update(float dt)
 	// 두개 모두 선택한 경우
 	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
 	{
-		MoveObjPos(dt);
+		if (IsSwappable(selectedObj1, selectedObj2))
+		{
+			MoveObjPos(dt);
+		}
+		else
+		{
+			selectedObj1 = nullptr;
+			selectedObj2 = nullptr;
+		}
 	}
 
 	Scene::Update(dt);
@@ -67,6 +75,21 @@ void SceneDev2::Update(float dt)
 void SceneDev2::Draw(sf::RenderWindow& window)
 {
 	Scene::Draw(window);
+}
+
+
+// 두 오브젝트 스왑 조건 확인
+bool SceneDev2::IsSwappable(const Object* a, const Object* b)
+{
+	if (a == nullptr || b == nullptr)
+	{
+		return false;
+	}
+
+	int dx = std::abs(a->GetIndex().x - b->GetIndex().x);
+	int dy = std::abs(a->GetIndex().y - b->GetIndex().y);
+
+	return dx + dy == 1;
 }
 
 // 오브젝트 이동
@@ -92,6 +115,11 @@ void SceneDev2::MoveObjPos(float dt)
         selectedObj2->SetPosition(selectedObj1Pos);
 
         std::swap(selectedObj1, selectedObj2);
+		sf::Vector2i index1 = selectedObj1->GetIndex();
+		sf::Vector2i index2 = selectedObj2->GetIndex();
+		selectedObj1->SetIndex(index2);
+		selectedObj2->SetIndex(index1);
+
         selectedObj1 = nullptr;
         selectedObj2 = nullptr;
 
@@ -143,8 +171,8 @@ void SceneDev2::CreateObjs()
 				object->Reset();
 				object->SetActive(true);
 				object->SetPosition(slots[i][j]->GetPosition());
+				object->SetIndex(sf::Vector2i(i, j));
 				objectGrid[i][j] = object;
-				
 			}
 		}
 	}
