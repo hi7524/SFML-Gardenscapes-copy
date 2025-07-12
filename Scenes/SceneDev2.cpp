@@ -207,6 +207,8 @@ void SceneDev2::MouseOnObj()
 // 라인 매치 검사
 void SceneDev2::CheckLineMatch()
 {
+	std::set<Object*> matchObjs;
+
 	// 행 검사
 	for (int i = 0; i < 7; i++)
 	{
@@ -219,28 +221,57 @@ void SceneDev2::CheckLineMatch()
 				if (countRow >= 2)
 				{
 					std::cout << "[가로] 3개 이상 중복" << std::endl;
+
+					for (Object* obj : matchObjs)
+					{
+						if (obj)
+						{
+							obj->SetActive(false);
+						}
+					}
 				}
 				countRow = 0;
+				matchObjs.clear();
 				continue;
 			}
 
 			if (objectGrid[i][j]->GetType() == objectGrid[i][j + 1]->GetType())
 			{
 				countRow++;
+				matchObjs.insert(objectGrid[i][j]);
+				matchObjs.insert(objectGrid[i][j + 1]);
 			}
 			else
 			{
 				if (countRow >= 2)
 				{
 					std::cout << "[가로] 3개 이상 중복" << std::endl;
+
+					for (Object* obj : matchObjs)
+					{
+						if (obj)
+						{
+							obj->SetActive(false);
+						}
+					}
 				}
 				countRow = 0;
+				matchObjs.clear();
 			}
 		}
 
 		if (countRow >= 2)
 		{
 			std::cout << "[가로] 3개 이상 중복" << std::endl;
+
+			for (Object* obj : matchObjs)
+			{
+				if (obj)
+				{
+					obj->SetActive(false);
+				}
+			}
+			matchObjs.clear();
 		}
 	}
 
@@ -256,28 +287,56 @@ void SceneDev2::CheckLineMatch()
 				if (countCol >= 2)
 				{
 					std::cout << "[세로] 3개 이상 중복" << std::endl;
+
+					for (Object* obj : matchObjs)
+					{
+						if (obj)
+						{
+							obj->SetActive(false);
+						}
+					}
 				}
 				countCol = 0;
+				matchObjs.clear();
 				continue;
 			}
 
 			if (objectGrid[i][j]->GetType() == objectGrid[i + 1][j]->GetType())
 			{
 				countCol++;
+				matchObjs.insert(objectGrid[i][j]);
+				matchObjs.insert(objectGrid[i + 1][j]);
 			}
 			else
 			{
 				if (countCol >= 2)
 				{
 					std::cout << "[세로] 3개 이상 중복" << std::endl;
+
+					for (Object* obj : matchObjs)
+					{
+						if (obj)
+						{
+							obj->SetActive(false);
+						}
+					}
 				}
 				countCol = 0;
+				matchObjs.clear();
 			}
 		}
 
 		if (countCol >= 2)
 		{
 			std::cout << "[세로] 3개 이상 중복" << std::endl;
+
+			for (Object* obj : matchObjs)
+			{
+				if (obj)
+				{
+					obj->SetActive(false);
+				}
+			}
 		}
 	}
 
