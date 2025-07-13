@@ -20,7 +20,7 @@ protected:
 	};
 
 	Slot* slots[7][7] = {nullptr};
-	Object* objectGrid[7][7] = { nullptr };
+	Object* objectArr[7][7] = { nullptr };
 
 	Object* selectedObj1 = nullptr; // 교환할 두 오브젝트 1
 	Object* selectedObj2 = nullptr; // 교환할 두 오브젝트 1
@@ -28,6 +28,8 @@ protected:
 	sf::Vector2f selectedObj1Pos = { 0.f, 0.f };
 	sf::Vector2f selectedObj2Pos = { 0.f, 0.f };
 	sf::Vector2f vectorZero = { 0.f, 0.f };
+
+	int emptyCount = 0;
 
 public:
 	SceneDev2();
@@ -39,6 +41,7 @@ public:
 	void Draw(sf::RenderWindow& window) override;
 
 	bool IsSwappable(const Object* a, const Object* b);
+	void Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType);
 	void MoveObjPos(float dt);
 	void CreateSlots();
 	int To1D(int i, int j);
@@ -46,6 +49,7 @@ public:
 	void SpawnObject(sf::Vector2f spawnPos);
 	void MouseOnObj();
 	void CheckLineMatch();
+	bool IsEmptyBelow(int c, int r);
 	//void DragObj();
 	//void SwapObjs(float dt);
 };

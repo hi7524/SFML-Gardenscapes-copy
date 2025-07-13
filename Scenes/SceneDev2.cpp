@@ -56,6 +56,74 @@ void SceneDev2::Update(float dt)
 		}
 	}
 
+	//for (int i = 0; i < 7; i++)
+	//{
+	//	for (int j = 0; j < 7; j++)
+	//	{
+	//		if (mapList[i][j] == 0) 
+	//			continue;
+
+	//		if (i + 1 < 7 && mapList[i + 1][j] == 1 && slots[i + 1][j] != nullptr)
+	//		{
+	//			sf::Vector2f targetPos = slots[i + 1][j]->GetPosition();
+
+	//			if (objectArr[i][j] != nullptr && IsEmptyBelow(i, j))
+	//			{
+	//				Object* obj = objectArr[i][j];
+
+	//				if (Utils::Distance(obj->GetPosition(), targetPos) <= 1.f)
+	//				{
+	//					obj->SetPosition(targetPos);
+	//					obj->SetIndex({ i + 1, j });
+
+	//					objectArr[i + 1][j] = obj;
+	//					objectArr[i][j] = nullptr;
+	//				}
+	//				else
+	//				{
+	//					Move(dt, obj, targetPos, 300.f);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+
+	
+
+	for (int i = 0; i < 7; i++) // 열
+	{
+		int fallCount = 0;
+		for (int j = 6; j >= 0; j--) // 아래에서 위로
+		{
+			if (mapList[j][i] == 0)
+				continue;
+
+			if (objectArr[j][i] == nullptr || !objectArr[j][i]->GetActive())
+			{
+				fallCount++;
+			}
+			else if (fallCount > 0)
+			{
+				int newRow = j + fallCount;
+				sf::Vector2f targetPos = slots[newRow][i]->GetPosition();
+				
+				if (Utils::Distance(objectArr[j][i]->GetPosition(), targetPos) > 0.1f)
+				{
+					Move(dt, objectArr[j][i], targetPos, 25, MoveType::Lerp);
+				}
+				else
+				{
+					//objectArr[j][i]->SetPosition(targetPos);
+					objectArr[j][i]->SetIndex({ newRow, i });
+
+					objectArr[newRow][i] = objectArr[j][i];
+					objectArr[j][i] = nullptr;
+				}
+			}
+		}
+	}
+
+
 	Scene::Update(dt);
 }
 
@@ -76,6 +144,29 @@ bool SceneDev2::IsSwappable(const Object* a, const Object* b)
 	int dy = std::abs(a->GetIndex().y - b->GetIndex().y);
 
 	return dx + dy == 1;
+}
+
+void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType)
+{
+	if (Utils::Distance(targetPos, obj->GetPosition()) <= 0.5f)
+	{
+		obj->SetPosition(targetPos);
+		return;
+	}
+
+	sf::Vector2f dir = Utils::GetNormal(targetPos - obj->GetPosition());
+	sf::Vector2f pos;
+
+	if (moveType == MoveType::Default)
+	{
+		pos = obj->GetPosition() + dir * speed * dt;
+	}
+	else if (moveType == MoveType::Lerp)
+	{
+		pos = Utils::Lerp(obj->GetPosition(), targetPos, dt * 9.f);
+	}
+
+	obj->SetPosition(pos);
 }
 
 // 오브젝트 이동
@@ -108,7 +199,7 @@ void SceneDev2::MoveObjPos(float dt)
 		selectedObj2->SetIndex(index1);
 
 		// 오브젝트가 들어있는 배열의 값 교환
-		std::swap(objectGrid[index1.x][index1.y], objectGrid[index2.x][index2.y]);
+		std::swap(objectArr[index1.x][index1.y], objectArr[index2.x][index2.y]);
 
 		// 초기화
         selectedObj1 = nullptr;
@@ -165,7 +256,7 @@ void SceneDev2::CreateObjs()
 				object->SetActive(true);
 				object->SetPosition(slots[i][j]->GetPosition());
 				object->SetIndex(sf::Vector2i(i, j));
-				objectGrid[i][j] = object;
+				objectArr[i][j] = object;
 			}
 		}
 	}
@@ -178,23 +269,22 @@ void SceneDev2::MouseOnObj()
 	{
 		for (int j = 0; j < 7; j++)
 		{
-			if (objectGrid[i][j] != nullptr)
+			if (objectArr[i][j] != nullptr)
 			{
-				if ((objectGrid[i][j]->GetGlobalBounds().left <= InputMgr::GetMousePosition().x && InputMgr::GetMousePosition().x <= objectGrid[i][j]->GetGlobalBounds().left + objectGrid[i][j]->GetGlobalBounds().width)
-					&& (objectGrid[i][j]->GetGlobalBounds().top <= InputMgr::GetMousePosition().y && InputMgr::GetMousePosition().y <= objectGrid[i][j]->GetGlobalBounds().top + objectGrid[i][j]->GetGlobalBounds().height))
+				if ((objectArr[i][j]->GetGlobalBounds().left <= InputMgr::GetMousePosition().x && InputMgr::GetMousePosition().x <= objectArr[i][j]->GetGlobalBounds().left + objectArr[i][j]->GetGlobalBounds().width)
+					&& (objectArr[i][j]->GetGlobalBounds().top <= InputMgr::GetMousePosition().y && InputMgr::GetMousePosition().y <= objectArr[i][j]->GetGlobalBounds().top + objectArr[i][j]->GetGlobalBounds().height))
 				{
-
 					if (InputMgr::GetMouseButtonDown(sf::Mouse::Left))
 					{
 						if (selectedObj1 == nullptr)
 						{
-							selectedObj1 = objectGrid[i][j];
+							selectedObj1 = objectArr[i][j];
 							return;
 						}
 
 						if (selectedObj1 != nullptr && selectedObj2 == nullptr)
 						{
-							selectedObj2 = objectGrid[i][j];
+							selectedObj2 = objectArr[i][j];
 							return;
 						}
 					}
@@ -216,12 +306,10 @@ void SceneDev2::CheckLineMatch()
 
 		for (int j = 0; j < 6; j++)
 		{
-			if (objectGrid[i][j] == nullptr || objectGrid[i][j + 1] == nullptr)
+			if (objectArr[i][j] == nullptr || objectArr[i][j + 1] == nullptr)
 			{
 				if (countRow >= 2)
 				{
-					std::cout << "[가로] 3개 이상 중복" << std::endl;
-
 					for (Object* obj : matchObjs)
 					{
 						if (obj)
@@ -235,18 +323,16 @@ void SceneDev2::CheckLineMatch()
 				continue;
 			}
 
-			if (objectGrid[i][j]->GetType() == objectGrid[i][j + 1]->GetType())
+			if (objectArr[i][j]->GetType() == objectArr[i][j + 1]->GetType())
 			{
 				countRow++;
-				matchObjs.insert(objectGrid[i][j]);
-				matchObjs.insert(objectGrid[i][j + 1]);
+				matchObjs.insert(objectArr[i][j]);
+				matchObjs.insert(objectArr[i][j + 1]);
 			}
 			else
 			{
 				if (countRow >= 2)
 				{
-					std::cout << "[가로] 3개 이상 중복" << std::endl;
-
 					for (Object* obj : matchObjs)
 					{
 						if (obj)
@@ -262,8 +348,6 @@ void SceneDev2::CheckLineMatch()
 
 		if (countRow >= 2)
 		{
-			std::cout << "[가로] 3개 이상 중복" << std::endl;
-
 			for (Object* obj : matchObjs)
 			{
 				if (obj)
@@ -282,12 +366,10 @@ void SceneDev2::CheckLineMatch()
 
 		for (int i = 0; i < 6; i++)
 		{
-			if (objectGrid[i][j] == nullptr || objectGrid[i + 1][j] == nullptr)
+			if (objectArr[i][j] == nullptr || objectArr[i + 1][j] == nullptr)
 			{
 				if (countCol >= 2)
 				{
-					std::cout << "[세로] 3개 이상 중복" << std::endl;
-
 					for (Object* obj : matchObjs)
 					{
 						if (obj)
@@ -301,18 +383,16 @@ void SceneDev2::CheckLineMatch()
 				continue;
 			}
 
-			if (objectGrid[i][j]->GetType() == objectGrid[i + 1][j]->GetType())
+			if (objectArr[i][j]->GetType() == objectArr[i + 1][j]->GetType())
 			{
 				countCol++;
-				matchObjs.insert(objectGrid[i][j]);
-				matchObjs.insert(objectGrid[i + 1][j]);
+				matchObjs.insert(objectArr[i][j]);
+				matchObjs.insert(objectArr[i + 1][j]);
 			}
 			else
 			{
 				if (countCol >= 2)
 				{
-					std::cout << "[세로] 3개 이상 중복" << std::endl;
-
 					for (Object* obj : matchObjs)
 					{
 						if (obj)
@@ -328,8 +408,6 @@ void SceneDev2::CheckLineMatch()
 
 		if (countCol >= 2)
 		{
-			std::cout << "[세로] 3개 이상 중복" << std::endl;
-
 			for (Object* obj : matchObjs)
 			{
 				if (obj)
@@ -339,8 +417,32 @@ void SceneDev2::CheckLineMatch()
 			}
 		}
 	}
+}
 
-	std::cout << "---------" << std::endl;
+// 아래 슬롯이 비어있는지 여부 확인
+bool SceneDev2::IsEmptyBelow(int c, int r)
+{
+	if (objectArr[c][r])
+	{
+		// 마지막이므로 아래에 더이상 내려갈 수 없음
+		if (c == 6)
+		{
+			return false;
+		}
+
+		if (objectArr[c + 1][r] == nullptr)
+		{
+			return true;
+		}
+
+		if (!objectArr[c + 1][r]->GetActive())
+		{
+			return true;
+		}
+
+		return false;
+	}
+	return false;
 }
 
 // 오브젝트 드래그

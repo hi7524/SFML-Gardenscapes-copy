@@ -43,3 +43,9 @@ enum class ObjectType
 	Potato, // 4 
 	Count
 };
+
+enum class MoveType
+{
+	Default,
+	Lerp,
+};
