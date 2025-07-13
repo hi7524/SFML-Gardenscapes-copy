@@ -8,12 +8,24 @@ SceneDev1::SceneDev1()
 
 void SceneDev1::Init()
 {
+	// Ã¢ ¼³Á¤
+	sf::Vector2f windowSize = FRAMEWORK.GetWindowSizeF();
+	worldView.setSize(windowSize);
+	worldView.setCenter(windowSize * 0.5f);
+
+	texIds.push_back("graphics/background.png");
+
 	Scene::Init();
 }
 
 void SceneDev1::Enter()
 {
 	Scene::Enter();
+
+	SpriteGo* background = new SpriteGo("graphics/background.png");
+	background->Init();
+	background->Reset();
+	AddGameObject(background);
 }
 
 void SceneDev1::Update(float dt)

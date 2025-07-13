@@ -26,6 +26,8 @@ void SceneDev2::Init()
 	texIds.push_back("graphics/potato.png");
 	texIds.push_back("graphics/background.png");
 
+	fontIds.push_back("fonts/minecraft_font.ttf");
+
 	Scene::Init();
 }
 
@@ -37,6 +39,17 @@ void SceneDev2::Enter()
 	background->Init();
 	background->Reset();
 	AddGameObject(background);
+
+	TextGo* swapCountTxt = new TextGo("fonts/minecraft_font.ttf");
+
+	swapCountTxt->Init();
+	swapCountTxt->Reset();
+
+	swapCountTxt->SetString("22");
+	swapCountTxt->SetFillColor(sf::Color::White);
+	swapCountTxt->SetCharacterSize(25);
+	swapCountTxt->SetPosition({ 100.f, 100.f });
+	AddGameObject(swapCountTxt);
 	
 	CreateSlots(); // 초기 슬롯 생성
 	CreateObjs(); // 초기 오브젝트 생성
@@ -103,15 +116,8 @@ void SceneDev2::Update(float dt)
 			}
 		}
 	}
-	CheckLineMatch();
 
-	for (int i = 0; i < 7; i++)
-	{
-		for (int j = 6; j >= 0; j--)
-		{
-			
-		}
-	}
+	CheckLineMatch();
 
 	Scene::Update(dt);
 }
