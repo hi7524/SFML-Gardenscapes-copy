@@ -8,6 +8,7 @@ protected:
 	std::string texId = "graphics/diamond.png";
 	ObjectType objectType = ObjectType::None;
 	bool isActive = true;
+	bool isMoving = false;
 	sf::Vector2i index = { -1, -1 }; // 현재 저장되어있는 인덱스를 저장할 변수, 위치 아님
 
 public:
@@ -32,7 +33,9 @@ public:
 	void SetType(ObjectType objType) { objectType = objType; }
 	ObjectType GetType() const { return objectType; }
 	void SetActive(bool active) { isActive = active; }
-	bool GetActive() { return isActive; }
+	bool GetActive() const { return isActive; }
+	void SetIsMove(bool move) { isMoving = move; }
+	bool GetIsMove() const  { return isMoving; }
 
 	sf::FloatRect GetGlobalBounds() const override
 	{

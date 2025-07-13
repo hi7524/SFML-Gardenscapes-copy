@@ -56,44 +56,11 @@ void SceneDev2::Update(float dt)
 		}
 	}
 
-	//for (int i = 0; i < 7; i++)
-	//{
-	//	for (int j = 0; j < 7; j++)
-	//	{
-	//		if (mapList[i][j] == 0) 
-	//			continue;
-
-	//		if (i + 1 < 7 && mapList[i + 1][j] == 1 && slots[i + 1][j] != nullptr)
-	//		{
-	//			sf::Vector2f targetPos = slots[i + 1][j]->GetPosition();
-
-	//			if (objectArr[i][j] != nullptr && IsEmptyBelow(i, j))
-	//			{
-	//				Object* obj = objectArr[i][j];
-
-	//				if (Utils::Distance(obj->GetPosition(), targetPos) <= 1.f)
-	//				{
-	//					obj->SetPosition(targetPos);
-	//					obj->SetIndex({ i + 1, j });
-
-	//					objectArr[i + 1][j] = obj;
-	//					objectArr[i][j] = nullptr;
-	//				}
-	//				else
-	//				{
-	//					Move(dt, obj, targetPos, 300.f);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
-	
-
-	for (int i = 0; i < 7; i++) // 열
+	for (int i = 0; i < 7; i++)
 	{
 		int fallCount = 0;
-		for (int j = 6; j >= 0; j--) // 아래에서 위로
+
+		for (int j = 6; j >= 0; j--)
 		{
 			if (mapList[j][i] == 0)
 				continue;
@@ -101,27 +68,39 @@ void SceneDev2::Update(float dt)
 			if (objectArr[j][i] == nullptr || !objectArr[j][i]->GetActive())
 			{
 				fallCount++;
+				continue;
+			}
+
+			if (objectArr[j][i]->GetIsMove())
+			{
+				int newRow = j + fallCount;
+				sf::Vector2f targetPos = slots[newRow][i]->GetPosition();
+
+				Move(dt, objectArr[j][i], targetPos, 10.f, MoveType::Lerp);
+
+				if (Utils::Distance(objectArr[j][i]->GetPosition(), targetPos) <= 0.1f)
+				{
+					objectArr[j][i]->SetIndex({ newRow, i });
+					objectArr[newRow][i] = objectArr[j][i];
+					objectArr[j][i] = nullptr;
+					objectArr[newRow][i]->SetIsMove(false);
+				}
+				continue;
 			}
 			else if (fallCount > 0)
 			{
 				int newRow = j + fallCount;
 				sf::Vector2f targetPos = slots[newRow][i]->GetPosition();
-				
-				if (Utils::Distance(objectArr[j][i]->GetPosition(), targetPos) > 0.1f)
-				{
-					Move(dt, objectArr[j][i], targetPos, 25, MoveType::Lerp);
-				}
-				else
-				{
-					//objectArr[j][i]->SetPosition(targetPos);
-					objectArr[j][i]->SetIndex({ newRow, i });
 
-					objectArr[newRow][i] = objectArr[j][i];
-					objectArr[j][i] = nullptr;
-				}
+				Move(dt, objectArr[j][i], targetPos, 10.f, MoveType::Lerp);
+				objectArr[j][i]->SetIsMove(true);
 			}
 		}
 	}
+	CheckLineMatch();
+
+
+
 
 
 	Scene::Update(dt);
@@ -163,7 +142,7 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 	}
 	else if (moveType == MoveType::Lerp)
 	{
-		pos = Utils::Lerp(obj->GetPosition(), targetPos, dt * 9.f);
+		pos = Utils::Lerp(obj->GetPosition(), targetPos, dt * speed);
 	}
 
 	obj->SetPosition(pos);
