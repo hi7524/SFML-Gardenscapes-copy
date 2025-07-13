@@ -43,7 +43,7 @@ void Object::SetOrigin(Origins preset)
 void Object::Init()
 {
 	sortingLayer = SortingLayers::Default;
-	sortingOrder = 0;
+	sortingOrder = 5;
 
 	object.setTexture(TEXTURE_MGR.Get(texId));
 }

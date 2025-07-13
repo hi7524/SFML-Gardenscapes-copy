@@ -35,7 +35,7 @@ public:
 	void SetActive(bool active) { isActive = active; }
 	bool GetActive() const { return isActive; }
 	void SetIsMove(bool move) { isMoving = move; }
-	bool GetIsMove() const  { return isMoving; }
+	bool GetIsMove() const { return isMoving; }
 
 	sf::FloatRect GetGlobalBounds() const override
 	{

@@ -24,6 +24,7 @@ void SceneDev2::Init()
 	texIds.push_back("graphics/redstone.png");
 	texIds.push_back("graphics/lava.png");
 	texIds.push_back("graphics/potato.png");
+	texIds.push_back("graphics/background.png");
 
 	Scene::Init();
 }
@@ -32,6 +33,11 @@ void SceneDev2::Enter()
 {
 	Scene::Enter();
 
+	SpriteGo* background = new SpriteGo("graphics/background.png");
+	background->Init();
+	background->Reset();
+	AddGameObject(background);
+	
 	CreateSlots(); // 초기 슬롯 생성
 	CreateObjs(); // 초기 오브젝트 생성
 }
@@ -99,9 +105,13 @@ void SceneDev2::Update(float dt)
 	}
 	CheckLineMatch();
 
-
-
-
+	for (int i = 0; i < 7; i++)
+	{
+		for (int j = 6; j >= 0; j--)
+		{
+			
+		}
+	}
 
 	Scene::Update(dt);
 }
