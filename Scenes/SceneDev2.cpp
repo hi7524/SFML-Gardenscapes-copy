@@ -252,6 +252,22 @@ void SceneDev2::CreateObjs()
 				object->SetPosition(slots[i][j]->GetPosition());
 				object->SetIndex(sf::Vector2i(i, j));
 				objectArr[i][j] = object;
+
+				if (j > 1 && objectArr[i][j - 1] != nullptr)
+				{
+					while (objectArr[i][j - 1]->GetType() == objectArr[i][j]->GetType())
+					{
+						objectArr[i][j]->Reset();
+					}
+				}
+
+				if (i > 1 && objectArr[i - 1][j] != nullptr)
+				{
+					while (objectArr[i - 1][j]->GetType() == objectArr[i][j]->GetType())
+					{
+						objectArr[i][j]->Reset();
+					}
+				}
 			}
 		}
 	}
