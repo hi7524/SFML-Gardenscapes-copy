@@ -40,7 +40,7 @@ void SceneDev2::Enter()
 	background->Reset();
 	AddGameObject(background);
 
-	TextGo* swapCountTxt = new TextGo("fonts/minecraft_font.ttf");
+	swapCountTxt = new TextGo("fonts/minecraft_font.ttf");
 
 	swapCountTxt->Init();
 	swapCountTxt->Reset();
@@ -57,8 +57,6 @@ void SceneDev2::Enter()
 
 void SceneDev2::Update(float dt)
 {
-	//DragObj();
-	//SwapObjs(dt);
 	MouseOnObj();
 
 	// 두개 모두 선택한 경우
@@ -66,7 +64,7 @@ void SceneDev2::Update(float dt)
 	{
 		if (IsSwappable(selectedObj1, selectedObj2))
 		{
-			MoveObjPos(dt);
+			SwapObjs(dt);
 		}
 		else
 		{
@@ -75,6 +73,92 @@ void SceneDev2::Update(float dt)
 		}
 	}
 
+	// 이동중이지 않을 때만 실행
+	if (!isMovingObjs)
+	{
+		CheckLineMatch();  // 매치 확인
+		DeleteMatchObjs(); // 매치된 오브젝트 파괴
+	}
+
+	MoveDown(dt);
+
+	for (int i = 0; i < 7; i++)
+	{
+		if (mapList[0][i] == 0 || slots[0][i] == nullptr)
+			continue;
+
+		if (objectArr[0][i] != nullptr)
+		{
+			if (objectArr[0][i]->GetIsMove())
+				continue;
+		}
+
+		if (slots[0][i] != nullptr && objectArr[0][i] == nullptr)
+		{
+			Object* object = (Object*)AddGameObject(new Object());
+			object->Init();
+			object->Reset();
+			object->SetActive(true);
+			object->SetPosition(slots[0][i]->GetPosition());
+			object->SetIndex(sf::Vector2i(0, i));
+			objectArr[0][i] = object;
+		}
+	}
+
+
+	swapCountTxt->SetString(std::to_string(swapCount));
+
+	Scene::Update(dt);
+}
+
+void SceneDev2::Draw(sf::RenderWindow& window)
+{
+	Scene::Draw(window);
+}
+
+// 두 오브젝트 스왑 조건 확인
+bool SceneDev2::IsSwappable(const Object* a, const Object* b)
+{
+	if (a == nullptr || b == nullptr)
+	{
+		return false;
+	}
+
+	int dx = std::abs(a->GetIndex().x - b->GetIndex().x);
+	int dy = std::abs(a->GetIndex().y - b->GetIndex().y);
+
+	return dx + dy == 1;
+}
+
+void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType)
+{
+	isMovingObjs = true;
+
+	if (Utils::Distance(targetPos, obj->GetPosition()) <= 0.5f)
+	{
+		obj->SetPosition(targetPos);
+		isMovingObjs = false;
+		return;
+	}
+
+	sf::Vector2f dir = Utils::GetNormal(targetPos - obj->GetPosition());
+	sf::Vector2f pos;
+
+	if (moveType == MoveType::Default)
+	{
+		pos = obj->GetPosition() + dir * speed * dt;
+	}
+	else if (moveType == MoveType::Lerp)
+	{
+		pos = Utils::Lerp(obj->GetPosition(), targetPos, dt * speed);
+	}
+
+	obj->SetPosition(pos);
+}
+
+// 아래가 비어있는지 체크 후 아래로 내려가도록 함
+void SceneDev2::MoveDown(float dt)
+{
 	for (int i = 0; i < 7; i++)
 	{
 		int fallCount = 0;
@@ -116,148 +200,55 @@ void SceneDev2::Update(float dt)
 			}
 		}
 	}
+}
 
-	CheckLineMatch();
-
-	//for (int i = 0; i < 7; i++)
-	//{
-	//	for (int j = 0; j < 7; j++)
-	//	{
-	//		if (objectArr[i][j] != nullptr)
-	//		{
-	//			std::cout << "[O] ";
-	//		}
-	//		else
-	//		{
-	//			std::cout << "[ ] ";
-	//		}
-	//	}
-	//	std::cout << std::endl;
-	//}
-
-	//for (int i = 0; i < 7; i++)
-	//{
-	//	for (int j = 0; j < 7; j++)
-	//	{
-	//		if (slots[i][j] != nullptr)
-	//		{
-	//			if (objectArr[i][j] == nullptr || objectArr[i][j]->GetIsMove())
-	//			{
-
-	//			}
-	//		}
-	//	}
-	//}
-
-	for (int i = 0; i < 7; i++)
+// 오브젝트 스왑
+void SceneDev2::SwapObjs(float dt)
+{
+	if (swapCount > 0)
 	{
-		if (mapList[0][i] == 0 || slots[0][i] == nullptr)
-			continue;
-
-		if (objectArr[0][i] != nullptr)
+		if (selectedObj1Pos == vectorZero && selectedObj2Pos == vectorZero)
 		{
-			if (objectArr[0][i]->GetIsMove())
-				continue;
+			selectedObj1Pos = selectedObj1->GetPosition();
+			selectedObj2Pos = selectedObj2->GetPosition();
 		}
 
-		if (slots[0][i] != nullptr && objectArr[0][i] == nullptr)
+		// 이동
+		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj2Pos, dt * 9.f);
+		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj1Pos, dt * 9.f);
+
+		selectedObj1->SetPosition(nextPos1);
+		selectedObj2->SetPosition(nextPos2);
+
+		// 근사치에 도달했을 경우 정보 변경
+		if (Utils::Distance(nextPos1, selectedObj2Pos) <= 0.5f && Utils::Distance(nextPos2, selectedObj1Pos) <= 0.5f)
 		{
-			Object* object = (Object*)AddGameObject(new Object());
-			object->Init();
-			object->Reset();
-			object->SetActive(true);
-			object->SetPosition(slots[0][i]->GetPosition());
-			object->SetIndex(sf::Vector2i(0, i));
-			objectArr[0][i] = object;
+			// 위치 설정
+			selectedObj1->SetPosition(selectedObj2Pos);
+			selectedObj2->SetPosition(selectedObj1Pos);
+
+			// 오브젝트 내부의 인덱스 설정
+			sf::Vector2i index1 = selectedObj1->GetIndex();
+			sf::Vector2i index2 = selectedObj2->GetIndex();
+			selectedObj1->SetIndex(index2);
+			selectedObj2->SetIndex(index1);
+
+			// 오브젝트가 들어있는 배열의 값 교환
+			std::swap(objectArr[index1.x][index1.y], objectArr[index2.x][index2.y]);
+
+			// 초기화
+			selectedObj1 = nullptr;
+			selectedObj2 = nullptr;
+			selectedObj1Pos = vectorZero;
+			selectedObj2Pos = vectorZero;
+
+			// 스왑 카운트 감소
+			swapCount--;
+
+			// 매치 여부 검사
+			CheckLineMatch();
 		}
 	}
-
-	Scene::Update(dt);
-}
-
-void SceneDev2::Draw(sf::RenderWindow& window)
-{
-	Scene::Draw(window);
-}
-
-// 두 오브젝트 스왑 조건 확인
-bool SceneDev2::IsSwappable(const Object* a, const Object* b)
-{
-	if (a == nullptr || b == nullptr)
-	{
-		return false;
-	}
-
-	int dx = std::abs(a->GetIndex().x - b->GetIndex().x);
-	int dy = std::abs(a->GetIndex().y - b->GetIndex().y);
-
-	return dx + dy == 1;
-}
-
-void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType)
-{
-	if (Utils::Distance(targetPos, obj->GetPosition()) <= 0.5f)
-	{
-		obj->SetPosition(targetPos);
-		return;
-	}
-
-	sf::Vector2f dir = Utils::GetNormal(targetPos - obj->GetPosition());
-	sf::Vector2f pos;
-
-	if (moveType == MoveType::Default)
-	{
-		pos = obj->GetPosition() + dir * speed * dt;
-	}
-	else if (moveType == MoveType::Lerp)
-	{
-		pos = Utils::Lerp(obj->GetPosition(), targetPos, dt * speed);
-	}
-
-	obj->SetPosition(pos);
-}
-
-// 오브젝트 이동
-void SceneDev2::MoveObjPos(float dt)
-{
-    if (selectedObj1Pos == vectorZero && selectedObj2Pos == vectorZero)
-    {
-        selectedObj1Pos = selectedObj1->GetPosition();
-        selectedObj2Pos = selectedObj2->GetPosition();
-    }
-
-    // 이동
-    sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj2Pos, dt * 9.f);
-    sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj1Pos, dt * 9.f);
-
-    selectedObj1->SetPosition(nextPos1);
-    selectedObj2->SetPosition(nextPos2);
-
-	// 근사치에 도달했을 경우 정보 변경
-    if (Utils::Distance(nextPos1, selectedObj2Pos) <= 0.5f && Utils::Distance(nextPos2, selectedObj1Pos) <= 0.5f)
-    {
-		// 위치 설정
-        selectedObj1->SetPosition(selectedObj2Pos);
-        selectedObj2->SetPosition(selectedObj1Pos);
-
-		// 오브젝트 내부의 인덱스 설정
-		sf::Vector2i index1 = selectedObj1->GetIndex();
-		sf::Vector2i index2 = selectedObj2->GetIndex();
-		selectedObj1->SetIndex(index2);
-		selectedObj2->SetIndex(index1);
-
-		// 오브젝트가 들어있는 배열의 값 교환
-		std::swap(objectArr[index1.x][index1.y], objectArr[index2.x][index2.y]);
-
-		// 초기화
-        selectedObj1 = nullptr;
-        selectedObj2 = nullptr;
-        selectedObj1Pos = vectorZero;
-        selectedObj2Pos = vectorZero;
-
-		// 매치 여부 검사
-		CheckLineMatch();
-    }
 }
 
 // 초기 슬롯 생성
@@ -361,8 +352,6 @@ void SceneDev2::MouseOnObj()
 // 라인 매치 검사
 void SceneDev2::CheckLineMatch()
 {
-	std::set<Object*> matchObjs;
-
 	// 행 검사
 	for (int i = 0; i < 7; i++)
 	{
@@ -374,56 +363,48 @@ void SceneDev2::CheckLineMatch()
 			{
 				if (countRow >= 2)
 				{
-					for (Object* obj : matchObjs)
+					int matchStart = j - countRow;
+					for (int k = matchStart; k <= j; k++)
 					{
-						if (obj)
+						if (objectArr[i][k] != nullptr)
 						{
-							obj->SetActive(false);
-							obj = nullptr;
+							matchObjs.insert(objectArr[i][k]);
 						}
 					}
 				}
 				countRow = 0;
-				matchObjs.clear();
 				continue;
 			}
 
 			if (objectArr[i][j]->GetType() == objectArr[i][j + 1]->GetType())
 			{
 				countRow++;
-				matchObjs.insert(objectArr[i][j]);
-				matchObjs.insert(objectArr[i][j + 1]);
 			}
 			else
 			{
 				if (countRow >= 2)
 				{
-					for (Object* obj : matchObjs)
+					int matchStart = j - countRow;
+					for (int k = matchStart; k <= j; k++)
 					{
-						if (obj)
+						if (objectArr[i][k] != nullptr)
 						{
-							obj->SetActive(false);
-							obj = nullptr;
+							matchObjs.insert(objectArr[i][k]);
 						}
 					}
 				}
 				countRow = 0;
-				matchObjs.clear();
 			}
 		}
 
 		if (countRow >= 2)
 		{
-			for (Object* obj : matchObjs)
+			int matchStart = 6 - countRow;
+			for (int k = matchStart; k <= 6; k++)
 			{
-				if (obj)
-				{
-					obj->SetActive(false);
-					objectArr[obj->GetIndex().x][obj->GetIndex().y] = nullptr;
-					obj = nullptr;
-				}
+				if (objectArr[i][k] != nullptr)
+					matchObjs.insert(objectArr[i][k]);
 			}
-			matchObjs.clear();
 		}
 	}
 
@@ -438,61 +419,72 @@ void SceneDev2::CheckLineMatch()
 			{
 				if (countCol >= 2)
 				{
-					for (Object* obj : matchObjs)
+					int matchStart = i - countCol;
+					for (int k = matchStart; k <= i; k++)
 					{
-						if (obj)
+						if (objectArr[k][j] != nullptr)
 						{
-							obj->SetActive(false);
-							objectArr[obj->GetIndex().x][obj->GetIndex().y] = nullptr;
-							obj = nullptr;
-
+							matchObjs.insert(objectArr[k][j]);
 						}
 					}
 				}
 				countCol = 0;
-				matchObjs.clear();
 				continue;
 			}
 
 			if (objectArr[i][j]->GetType() == objectArr[i + 1][j]->GetType())
 			{
 				countCol++;
-				matchObjs.insert(objectArr[i][j]);
-				matchObjs.insert(objectArr[i + 1][j]);
 			}
 			else
 			{
 				if (countCol >= 2)
 				{
-					for (Object* obj : matchObjs)
+					int matchStart = i - countCol;
+					for (int k = matchStart; k <= i; k++)
 					{
-						if (obj)
+						if (objectArr[k][j] != nullptr)
 						{
-							obj->SetActive(false);
-							objectArr[obj->GetIndex().x][obj->GetIndex().y] = nullptr;
-							obj = nullptr;
+							matchObjs.insert(objectArr[k][j]);
 						}
 					}
 				}
 				countCol = 0;
-				matchObjs.clear();
 			}
 		}
 
 		if (countCol >= 2)
 		{
-			for (Object* obj : matchObjs)
+			int matchStart = 6 - countCol;
+			for (int k = matchStart; k <= 6; k++)
 			{
-				if (obj)
-				{
-					obj->SetActive(false);
-					objectArr[obj->GetIndex().x][obj->GetIndex().y] = nullptr;
-					obj = nullptr;
-				}
+				if (objectArr[k][j] != nullptr)
+					matchObjs.insert(objectArr[k][j]);
 			}
-			matchObjs.clear();
 		}
 	}
+}
+
+// 매치된 오브젝트 삭제
+void SceneDev2::DeleteMatchObjs()
+{
+	// 매치된 요소 존재하지 않을 경우 건너 뛰기
+	if (matchObjs.size() <= 0)
+	{
+		return;
+	}
+
+	for (auto obj : matchObjs)
+	{
+		if (obj != nullptr)
+		{
+			obj->SetActive(false);
+			sf::Vector2i index = obj->GetIndex();
+			objectArr[index.x][index.y] = nullptr;
+		}
+	}
+
+	matchObjs.clear();
 }
 
 // 아래 슬롯이 비어있는지 여부 확인

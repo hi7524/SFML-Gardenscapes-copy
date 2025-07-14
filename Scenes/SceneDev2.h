@@ -21,6 +21,7 @@ protected:
 
 	Slot* slots[7][7] = {nullptr};
 	Object* objectArr[7][7] = { nullptr };
+	std::set<Object*> matchObjs; // 매치된 오브젝트가 담길 배열
 
 	Object* selectedObj1 = nullptr; // 교환할 두 오브젝트 1
 	Object* selectedObj2 = nullptr; // 교환할 두 오브젝트 1
@@ -29,7 +30,10 @@ protected:
 	sf::Vector2f selectedObj2Pos = { 0.f, 0.f };
 	sf::Vector2f vectorZero = { 0.f, 0.f };
 
-	int emptyCount = 0;
+	int swapCount = 22;
+	TextGo* swapCountTxt = new TextGo("fonts/minecraft_font.ttf"); // 나중에 canvas 추가하면 거기로 옮기기
+
+	bool isMovingObjs = false; // 오브젝트 움직이고 있는중인지 저장할 bool변수
 
 public:
 	SceneDev2();
@@ -42,13 +46,15 @@ public:
 
 	bool IsSwappable(const Object* a, const Object* b);
 	void Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType);
-	void MoveObjPos(float dt);
+	void MoveDown(float dt);
+	void SwapObjs(float dt);
 	void CreateSlots();
 	int To1D(int i, int j);
 	void CreateObjs();
-	void SpawnObject(sf::Vector2f spawnPos);
+	//void SpawnObject(sf::Vector2f spawnPos);
 	void MouseOnObj();
 	void CheckLineMatch();
+	void DeleteMatchObjs();
 	bool IsEmptyBelow(int c, int r);
 	//void DragObj();
 	//void SwapObjs(float dt);
