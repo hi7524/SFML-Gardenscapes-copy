@@ -56,8 +56,11 @@ void SceneDev2::Enter()
 }
 
 void SceneDev2::Update(float dt)
-{
-	MouseOnObj();
+{ 
+	if (!isMovingObjs)
+	{
+		MouseOnObj();
+	}
 
 	// 두개 모두 선택한 경우
 	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
