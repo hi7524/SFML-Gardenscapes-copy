@@ -119,6 +119,59 @@ void SceneDev2::Update(float dt)
 
 	CheckLineMatch();
 
+	//for (int i = 0; i < 7; i++)
+	//{
+	//	for (int j = 0; j < 7; j++)
+	//	{
+	//		if (objectArr[i][j] != nullptr)
+	//		{
+	//			std::cout << "[O] ";
+	//		}
+	//		else
+	//		{
+	//			std::cout << "[ ] ";
+	//		}
+	//	}
+	//	std::cout << std::endl;
+	//}
+
+	//for (int i = 0; i < 7; i++)
+	//{
+	//	for (int j = 0; j < 7; j++)
+	//	{
+	//		if (slots[i][j] != nullptr)
+	//		{
+	//			if (objectArr[i][j] == nullptr || objectArr[i][j]->GetIsMove())
+	//			{
+
+	//			}
+	//		}
+	//	}
+	//}
+
+	for (int i = 0; i < 7; i++)
+	{
+		if (mapList[0][i] == 0 || slots[0][i] == nullptr)
+			continue;
+
+		if (objectArr[0][i] != nullptr)
+		{
+			if (objectArr[0][i]->GetIsMove())
+				continue;
+		}
+
+		if (slots[0][i] != nullptr && objectArr[0][i] == nullptr)
+		{
+			Object* object = (Object*)AddGameObject(new Object());
+			object->Init();
+			object->Reset();
+			object->SetActive(true);
+			object->SetPosition(slots[0][i]->GetPosition());
+			object->SetIndex(sf::Vector2i(0, i));
+			objectArr[0][i] = object;
+		}
+	}
+
 	Scene::Update(dt);
 }
 
@@ -326,6 +379,7 @@ void SceneDev2::CheckLineMatch()
 						if (obj)
 						{
 							obj->SetActive(false);
+							obj = nullptr;
 						}
 					}
 				}
@@ -349,6 +403,7 @@ void SceneDev2::CheckLineMatch()
 						if (obj)
 						{
 							obj->SetActive(false);
+							obj = nullptr;
 						}
 					}
 				}
@@ -364,6 +419,8 @@ void SceneDev2::CheckLineMatch()
 				if (obj)
 				{
 					obj->SetActive(false);
+					objectArr[obj->GetIndex().x][obj->GetIndex().y] = nullptr;
+					obj = nullptr;
 				}
 			}
 			matchObjs.clear();
@@ -386,6 +443,9 @@ void SceneDev2::CheckLineMatch()
 						if (obj)
 						{
 							obj->SetActive(false);
+							objectArr[obj->GetIndex().x][obj->GetIndex().y] = nullptr;
+							obj = nullptr;
+
 						}
 					}
 				}
@@ -409,6 +469,8 @@ void SceneDev2::CheckLineMatch()
 						if (obj)
 						{
 							obj->SetActive(false);
+							objectArr[obj->GetIndex().x][obj->GetIndex().y] = nullptr;
+							obj = nullptr;
 						}
 					}
 				}
@@ -424,8 +486,11 @@ void SceneDev2::CheckLineMatch()
 				if (obj)
 				{
 					obj->SetActive(false);
+					objectArr[obj->GetIndex().x][obj->GetIndex().y] = nullptr;
+					obj = nullptr;
 				}
 			}
+			matchObjs.clear();
 		}
 	}
 }
