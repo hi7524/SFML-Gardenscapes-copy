@@ -108,6 +108,19 @@ void SceneDev2::Update(float dt)
 		}
 	}
 
+if (objectArr[0][1] != nullptr && objectArr[1][0] == nullptr)
+{
+    sf::Vector2f targetPos = slots[1][0]->GetPosition();
+    Move(dt, objectArr[0][1], targetPos, 10.f, MoveType::Lerp);
+
+    if (Utils::Distance(objectArr[0][1]->GetPosition(), targetPos) <= 0.1f)
+    {
+        objectArr[0][1]->SetPosition(targetPos);
+        objectArr[0][1]->SetIndex({1, 0});
+        objectArr[1][0] = objectArr[0][1];
+        objectArr[0][1] = nullptr;
+    }
+}
 
 	swapCountTxt->SetString(std::to_string(swapCount));
 
