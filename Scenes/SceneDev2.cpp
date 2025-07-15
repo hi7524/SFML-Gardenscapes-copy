@@ -57,122 +57,141 @@ void SceneDev2::Enter()
 
 void SceneDev2::Update(float dt)
 {
-	isMovingObjs = false;
-
-	for (int i = 0; i < 7; i++)
+	// 대기 및 입력
+	if (state == GameState::Idle)
 	{
-		for (int j = 0; j < 7; j++)
+		if (!isMovingObjs)
 		{
-			if (objectArr[i][j] != nullptr && objectArr[i][j]->GetIsMove())
+			MouseOnObj();
+		}
+
+		// 두개 모두 선택한 경우
+		if (selectedObj1 != nullptr && selectedObj2 != nullptr)
+		{
+			if (IsSwappable(selectedObj1, selectedObj2))
 			{
-				isMovingObjs = true;
-				break;
-			}
-		}
-		if (isMovingObjs) break;
-	}
-
-	//std::cout << isMovingObjs << std::endl;
-	if (!isMovingObjs)
-	{
-		MouseOnObj();
-	}
-
-
-	// 두개 모두 선택한 경우
-	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
-	{
-		if (IsSwappable(selectedObj1, selectedObj2))
-		{
-			SwapObjs(dt);
-		}
-		else
-		{
-			selectedObj1 = nullptr;
-			selectedObj2 = nullptr;
-		}
-	}
-
-	// 이동중이지 않을 때만 실행
-	if (!isMovingObjs && !isSpawning)
-	{
-		CheckLineMatch();  // 매치 확인
-		DeleteMatchObjs(); // 매치된 오브젝트 파괴
-	}
-
-	MoveDown(dt);
-
-	for (int i = 0; i < 7; i++)
-	{
-		if (mapList[0][i] == 0 || slots[0][i] == nullptr)
-			continue;
-
-		if (objectArr[0][i] != nullptr)
-		{
-			if (objectArr[0][i]->GetIsMove())
-				continue;
-		}
-
-		if (slots[0][i] != nullptr && objectArr[0][i] == nullptr)
-		{
-			Object* object = (Object*)AddGameObject(new Object());
-			object->Init();
-			object->Reset();
-			object->SetActive(true);
-			object->SetPosition({ slots[0][i]->GetPosition().x, slots[0][i]->GetPosition().y - 64 });
-			object->SetIndex(sf::Vector2i(0, i));
-			objectArr[0][i] = object;
-			isSpawning = true;
-		}
-	}
-
-	if (isSpawning)
-	{
-		bool allReached = true;
-
-		for (int i = 0; i < 7; i++)
-		{
-			if (objectArr[0][i] == nullptr)
-				continue;
-
-			sf::Vector2f targetPos = slots[objectArr[0][i]->GetIndex().x][objectArr[0][i]->GetIndex().y]->GetPosition();
-			if (Utils::Distance(objectArr[0][i]->GetPosition(), targetPos) >= 0.5f)
-			{
-				Move(dt, objectArr[0][i], targetPos, 15.f, MoveType::Default);
-				allReached = false;
+				state = GameState::Swapping;
 			}
 			else
 			{
-				objectArr[0][i]->SetPosition(targetPos);
-				objectArr[0][i]->SetIsMove(false);
+				selectedObj1 = nullptr;
+				selectedObj2 = nullptr;
+			}
+		}
+	}
+	else if (state == GameState::Swapping)
+	{
+		SwapObjs(dt);
+	}
+	else if (state == GameState::CheckingMatchSwap)
+	{
+		CheckLineMatch();
+		DeleteMatchObjs();
+		state = GameState::Moving;
+	}
+	else if (state == GameState::Moving)
+	{
+		MoveDown(dt);
+
+		// 대각선 이동
+		if (objectArr[0][1] != nullptr
+			&& Utils::Distance(objectArr[0][1]->GetPosition(), slots[0][1]->GetPosition()) < 0.5f
+			&& objectArr[1][0] == nullptr)
+		{
+			ChangeObj(objectArr[0][1], 1, 0);
+
+			sf::Vector2f targetPos = slots[1][0]->GetPosition();
+			Move(dt, objectArr[1][0], targetPos, 10.f, MoveType::Lerp);
+		}
+
+		if (objectArr[0][5] != nullptr
+			&& Utils::Distance(objectArr[0][5]->GetPosition(), slots[0][5]->GetPosition()) < 0.5f
+			&& objectArr[1][6] == nullptr)
+		{
+			ChangeObj(objectArr[0][5], 1, 6);
+
+			sf::Vector2f targetPos = slots[1][6]->GetPosition();
+			Move(dt, objectArr[1][6], targetPos, 10.f, MoveType::Lerp);
+		}
+
+		for (int i = 0; i < 7; i++)
+		{
+			if (mapList[0][i] == 0 || slots[0][i] == nullptr)
+				continue;
+
+			if (objectArr[0][i] != nullptr)
+			{
+				if (objectArr[0][i]->GetIsMove())
+					continue;
+			}
+
+			if (slots[0][i] != nullptr && objectArr[0][i] == nullptr)
+			{
+				Object* object = (Object*)AddGameObject(new Object());
+				object->Init();
+				object->Reset();
+				object->SetActive(true);
+				object->SetPosition({ slots[0][i]->GetPosition().x, slots[0][i]->GetPosition().y - 64 });
+				object->SetIndex(sf::Vector2i(0, i));
+				objectArr[0][i] = object;
+				isSpawning = true;
 			}
 		}
 
-		if (allReached)
+		if (isSpawning)
 		{
-			isSpawning = false;
+			bool allReached = true;
+
+			for (int i = 0; i < 7; i++)
+			{
+				if (objectArr[0][i] == nullptr)
+					continue;
+
+				sf::Vector2f targetPos = slots[objectArr[0][i]->GetIndex().x][objectArr[0][i]->GetIndex().y]->GetPosition();
+				if (Utils::Distance(objectArr[0][i]->GetPosition(), targetPos) >= 0.5f)
+				{
+					Move(dt, objectArr[0][i], targetPos, 15.f, MoveType::Default);
+					allReached = false;
+				}
+				else
+				{
+					objectArr[0][i]->SetPosition(targetPos);
+					objectArr[0][i]->SetIsMove(false);
+				}
+			}
+
+			if (allReached)
+			{
+				isSpawning = false;
+			}
+		}
+
+		if (IsAllObjectsStopped())
+		{
+			frameCount++;
+		}
+		else
+		{
+			frameCount = 0;
+		}
+
+		if (frameCount >= 3)
+		{
+			state = GameState::CheckingMatchMove;
 		}
 	}
-
-	// 대각선 이동
-	if (objectArr[0][1] != nullptr
-		&& Utils::Distance(objectArr[0][1]->GetPosition(), slots[0][1]->GetPosition()) < 0.5f
-		&& objectArr[1][0] == nullptr)
+	else if (state == GameState::CheckingMatchMove)
 	{
-		ChangeObj(objectArr[0][1], 1, 0);
-
-		sf::Vector2f targetPos = slots[1][0]->GetPosition();
-		Move(dt, objectArr[1][0], targetPos, 10.f, MoveType::Lerp);
-	}
-
-	if (objectArr[0][5] != nullptr
-		&& Utils::Distance(objectArr[0][5]->GetPosition(), slots[0][5]->GetPosition()) < 0.5f
-		&& objectArr[1][6] == nullptr)
-	{
-		ChangeObj(objectArr[0][5], 1, 6);
-
-		sf::Vector2f targetPos = slots[1][6]->GetPosition();
-		Move(dt, objectArr[1][6], targetPos, 10.f, MoveType::Lerp);
+		CheckLineMatch();
+		if (matchObjs.size() > 0)
+		{
+			DeleteMatchObjs();
+			state = GameState::Moving;
+		}
+		else
+		{
+			state = GameState::Idle;
+		}
 	}
 
 	swapCountTxt->SetString(std::to_string(swapCount));
@@ -307,6 +326,7 @@ void SceneDev2::SwapObjs(float dt)
 
 			// 매치 여부 검사
 			//CheckLineMatch();
+			state = GameState::CheckingMatchSwap;
 		}
 	}
 }
@@ -597,6 +617,19 @@ bool SceneDev2::IsEmptyBelow(int c, int r)
 		return false;
 	}
 	return false;
+}
+
+bool SceneDev2::IsAllObjectsStopped()
+{
+	for (int i = 0; i < 7; i++)
+	{
+		for (int j = 0; j < 7; j++)
+		{
+			if (objectArr[i][j] != nullptr && objectArr[i][j]->GetIsMove())
+				return false;
+		}
+	}
+	return true;
 }
 
 // 오브젝트 드래그

@@ -38,6 +38,10 @@ protected:
 
 	float objectMoveSpeed = 350.f;
 
+	GameState state = GameState::Idle;
+
+	int frameCount = 0;
+
 public:
 	SceneDev2();
 	~SceneDev2() override = default;
@@ -62,6 +66,7 @@ public:
 	void CheckLineMatch();
 	void DeleteMatchObjs();
 	bool IsEmptyBelow(int c, int r);
+	bool IsAllObjectsStopped();
 	//void DragObj();
 	//void SwapObjs(float dt);
 };

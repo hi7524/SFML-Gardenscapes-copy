@@ -49,3 +49,12 @@ enum class MoveType
 	Default,
 	Lerp,
 };
+
+enum class GameState
+{
+	Idle,
+	Swapping,
+	CheckingMatchSwap,
+	Moving,
+	CheckingMatchMove,
+};
