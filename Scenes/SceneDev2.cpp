@@ -5,7 +5,7 @@
 
 sf::Vector2f originVec = { 0.f, 0.f };
 
-SceneDev2::SceneDev2() 
+SceneDev2::SceneDev2()
 	: Scene(SceneIds::Dev2)
 {
 }
@@ -50,13 +50,13 @@ void SceneDev2::Enter()
 	swapCountTxt->SetCharacterSize(25);
 	swapCountTxt->SetPosition({ 100.f, 100.f });
 	AddGameObject(swapCountTxt);
-	
+
 	CreateSlots(); // 초기 슬롯 생성
 	CreateObjs(); // 초기 오브젝트 생성
 }
 
 void SceneDev2::Update(float dt)
-{ 
+{
 	if (!isMovingObjs)
 	{
 		MouseOnObj();
@@ -195,7 +195,7 @@ void SceneDev2::MoveDown(float dt)
 {
 	for (int i = 0; i < 7; i++)
 	{
-		for (int j = 6; j >= 0; j--) // 맨 아래는 6이라서 5부터 시작
+		for (int j = 6; j >= 0; j--)
 		{
 			if (mapList[j][i] == 0)
 				continue;
