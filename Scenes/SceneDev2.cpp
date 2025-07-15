@@ -77,7 +77,7 @@ void SceneDev2::Update(float dt)
 	}
 
 	// 이동중이지 않을 때만 실행
-	if (!isMovingObjs)
+	if (!isMovingObjs && !isSpawning)
 	{
 		CheckLineMatch();  // 매치 확인
 		DeleteMatchObjs(); // 매치된 오브젝트 파괴
@@ -102,13 +102,40 @@ void SceneDev2::Update(float dt)
 			object->Init();
 			object->Reset();
 			object->SetActive(true);
-			object->SetPosition(slots[0][i]->GetPosition());
+			object->SetPosition({ slots[0][i]->GetPosition().x, slots[0][i]->GetPosition().y - 64 });
 			object->SetIndex(sf::Vector2i(0, i));
 			objectArr[0][i] = object;
+			isSpawning = true;
 		}
 	}
 
+	if (isSpawning)
+	{
+		bool allReached = true;
 
+		for (int i = 0; i < 7; i++)
+		{
+			if (objectArr[0][i] == nullptr)
+				continue;
+
+			sf::Vector2f targetPos = slots[objectArr[0][i]->GetIndex().x][objectArr[0][i]->GetIndex().y]->GetPosition();
+			if (Utils::Distance(objectArr[0][i]->GetPosition(), targetPos) >= 0.5f)
+			{
+				Move(dt, objectArr[0][i], targetPos, 15.f, MoveType::Default);
+				allReached = false;
+			}
+			else
+			{
+				objectArr[0][i]->SetPosition(targetPos);
+			}
+		}
+
+		if (allReached)
+		{
+			isMovingObjs = false;
+			isSpawning = false;
+		}
+	}
 
 	// 대각선 이동
 //if (objectArr[0][1] != nullptr && objectArr[1][0] == nullptr)
@@ -152,11 +179,13 @@ bool SceneDev2::IsSwappable(const Object* a, const Object* b)
 void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType)
 {
 	isMovingObjs = true;
+	obj->SetIsMove(true);
 
 	if (Utils::Distance(targetPos, obj->GetPosition()) <= 0.5f)
 	{
 		obj->SetPosition(targetPos);
 		isMovingObjs = false;
+		obj->SetIsMove(false);
 		return;
 	}
 
@@ -207,7 +236,7 @@ void SceneDev2::MoveDown(float dt)
 			{
 				sf::Vector2i idx = objectArr[j][i]->GetIndex();
 				sf::Vector2f targetPos = slots[idx.x][idx.y]->GetPosition();
-				Move(dt, objectArr[j][i], targetPos, 400.f, MoveType::Default);
+				Move(dt, objectArr[j][i], targetPos, objectMoveSpeed, MoveType::Default);
 
 				if (Utils::Distance(objectArr[j][i]->GetPosition(), targetPos) <= 0.1f)
 				{

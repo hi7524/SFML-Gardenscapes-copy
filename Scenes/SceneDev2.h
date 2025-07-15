@@ -34,6 +34,9 @@ protected:
 	TextGo* swapCountTxt = new TextGo("fonts/minecraft_font.ttf"); // 나중에 canvas 추가하면 거기로 옮기기
 
 	bool isMovingObjs = false; // 오브젝트 움직이고 있는중인지 저장할 bool변수
+	bool isSpawning = false;
+
+	float objectMoveSpeed = 350.f;
 
 public:
 	SceneDev2();
