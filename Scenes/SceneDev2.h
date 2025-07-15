@@ -46,7 +46,7 @@ public:
 
 	bool IsSwappable(const Object* a, const Object* b);
 	void Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType);
-	bool Test(const Object* obj);
+	//bool Test(const Object* obj);
 	void MoveDown(float dt);
 	void SwapObjs(float dt);
 	void CreateSlots();

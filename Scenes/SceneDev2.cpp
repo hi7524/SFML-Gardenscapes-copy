@@ -175,66 +175,54 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 	obj->SetPosition(pos);
 }
 
-// 아래가 비어있는지 체크
-bool SceneDev2::Test(const Object* obj)
-{
-	if (obj == nullptr)
-		return false;
-
-	sf::Vector2i curIdx = obj->GetIndex();
-
-	if (curIdx.x >= 6 || mapList[curIdx.x][curIdx.y] == 0)
-		return false;
-
-	if (objectArr[curIdx.x + 1][curIdx.y] == nullptr)
-		return true;
-}
+//// 아래가 비어있는지 체크
+//bool SceneDev2::Test(const Object* obj)
+//{
+//	if (obj == nullptr)
+//		return false;
+//
+//	sf::Vector2i curIdx = obj->GetIndex();
+//
+//	if (curIdx.x >= 6 || mapList[curIdx.x][curIdx.y] == 0)
+//		return false;
+//
+//	if (objectArr[curIdx.x + 1][curIdx.y] == nullptr)
+//		return true;
+//}
 
 // 아래가 비어있는지 체크 후 아래로 내려가도록 함
 void SceneDev2::MoveDown(float dt)
 {
 	for (int i = 0; i < 7; i++)
 	{
-		int fallCount = 0;
-
-		for (int j = 6; j >= 0; j--)
+		for (int j = 6; j >= 0; j--) // 맨 아래는 6이라서 5부터 시작
 		{
 			if (mapList[j][i] == 0)
 				continue;
 
 			if (objectArr[j][i] == nullptr || !objectArr[j][i]->GetActive())
-			{
-				fallCount++;
 				continue;
-			}
 
 			if (objectArr[j][i]->GetIsMove())
 			{
-				int newRow = j + fallCount;
+				sf::Vector2i idx = objectArr[j][i]->GetIndex();
+				sf::Vector2f targetPos = slots[idx.x][idx.y]->GetPosition();
+				Move(dt, objectArr[j][i], targetPos, 400.f, MoveType::Default);
 
-				ChangeObj(objectArr[j][i], newRow, i);
-
-				sf::Vector2i newIdx = objectArr[newRow][i]->GetIndex();
-				sf::Vector2f targetPos = slots[newIdx.x][newIdx.y]->GetPosition();
-				Move(dt, objectArr[newRow][i], targetPos, 10.f, MoveType::Lerp);
-
-				if (Utils::Distance(objectArr[newRow][i]->GetPosition(), targetPos) <= 0.1f)
+				if (Utils::Distance(objectArr[j][i]->GetPosition(), targetPos) <= 0.1f)
 				{
-					//objectArr[j][i]->SetIndex({ newRow, i });
-					//objectArr[newRow][i] = objectArr[j][i];
-					//objectArr[j][i] = nullptr;
-					objectArr[newRow][i]->SetIsMove(false);
-					fallCount = 0;
+					objectArr[j][i]->SetPosition(targetPos);
+					objectArr[j][i]->SetIsMove(false);
 				}
 				continue;
 			}
-			else if (fallCount > 0)
-			{
-				//int newRow = j + fallCount;
-				//sf::Vector2f targetPos = slots[newRow][i]->GetPosition();
 
-				//Move(dt, objectArr[j][i], targetPos, 10.f, MoveType::Lerp);
-				objectArr[j][i]->SetIsMove(true);
+			// 바로 아래 칸 체크
+			int belowRow = j + 1;
+			if (belowRow < 7 && mapList[belowRow][i] != 0 && objectArr[belowRow][i] == nullptr)
+			{
+				ChangeObj(objectArr[j][i], belowRow, i);
+				objectArr[belowRow][i]->SetIsMove(true);
 			}
 		}
 	}
@@ -352,6 +340,7 @@ void SceneDev2::CreateObjs()
 // 오브젝트 정보 변경 (obj[i][j] to obj[x][y])
 void SceneDev2::ChangeObj(Object* obj, int x, int y)
 {
+
 	// 오브젝트가 들어있는 배열의 값 교환
 	sf::Vector2i index = obj->GetIndex();
 
