@@ -81,7 +81,7 @@ void SceneDev2::Update(float dt)
 	}
 	else if (state == GameState::Swapping)
 	{
-		SwapObjs(dt);
+		TryToSwap(dt);
 	}
 	else if (state == GameState::CheckingMatchSwap)
 	{
@@ -281,6 +281,44 @@ void SceneDev2::MoveDown(float dt)
 	}
 }
 
+// 스왑 시도
+void SceneDev2::TryToSwap(float dt)
+{
+	SwapObjs(dt);
+	CheckLineMatch();
+
+	if (matchObjs.size() > 0)
+	{
+		clearClickedInfo();
+	}
+	else
+	{
+		SwapObjs(dt);
+
+		//if (test)
+		//{
+		//	clearClickedInfo();
+		//	test = false;
+		//}
+	}
+}
+
+void SceneDev2::clearClickedInfo()
+{
+	// 초기화
+	selectedObj1 = nullptr;
+	selectedObj2 = nullptr;
+	selectedObj1Pos = vectorZero;
+	selectedObj2Pos = vectorZero;
+
+	// 스왑 카운트 감소
+	swapCount--;
+
+	// 매치 여부 검사
+	//CheckLineMatch();
+	state = GameState::CheckingMatchSwap;
+}
+
 // 오브젝트 스왑
 void SceneDev2::SwapObjs(float dt)
 {
@@ -315,18 +353,10 @@ void SceneDev2::SwapObjs(float dt)
 			// 오브젝트가 들어있는 배열의 값 교환
 			std::swap(objectArr[index1.x][index1.y], objectArr[index2.x][index2.y]);
 
-			// 초기화
-			selectedObj1 = nullptr;
-			selectedObj2 = nullptr;
 			selectedObj1Pos = vectorZero;
 			selectedObj2Pos = vectorZero;
 
-			// 스왑 카운트 감소
-			swapCount--;
-
-			// 매치 여부 검사
-			//CheckLineMatch();
-			state = GameState::CheckingMatchSwap;
+			test = true;
 		}
 	}
 }
@@ -394,7 +424,6 @@ void SceneDev2::CreateObjs()
 // 오브젝트 정보 변경 (obj[i][j] to obj[x][y])
 void SceneDev2::ChangeObj(Object* obj, int x, int y)
 {
-
 	// 오브젝트가 들어있는 배열의 값 교환
 	sf::Vector2i index = obj->GetIndex();
 

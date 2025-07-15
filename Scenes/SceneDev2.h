@@ -42,6 +42,8 @@ protected:
 
 	int frameCount = 0;
 
+	bool test = false;
+
 public:
 	SceneDev2();
 	~SceneDev2() override = default;
@@ -55,6 +57,8 @@ public:
 	void Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType);
 	//bool Test(const Object* obj);
 	void MoveDown(float dt);
+	void TryToSwap(float dt);
+	void clearClickedInfo();
 	void SwapObjs(float dt);
 	void CreateSlots();
 	int To1D(int i, int j);
