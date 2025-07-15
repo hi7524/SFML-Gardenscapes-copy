@@ -108,19 +108,22 @@ void SceneDev2::Update(float dt)
 		}
 	}
 
-if (objectArr[0][1] != nullptr && objectArr[1][0] == nullptr)
-{
-    sf::Vector2f targetPos = slots[1][0]->GetPosition();
-    Move(dt, objectArr[0][1], targetPos, 10.f, MoveType::Lerp);
 
-    if (Utils::Distance(objectArr[0][1]->GetPosition(), targetPos) <= 0.1f)
-    {
-        objectArr[0][1]->SetPosition(targetPos);
-        objectArr[0][1]->SetIndex({1, 0});
-        objectArr[1][0] = objectArr[0][1];
-        objectArr[0][1] = nullptr;
-    }
-}
+
+	// 대각선 이동
+//if (objectArr[0][1] != nullptr && objectArr[1][0] == nullptr)
+//{
+//    sf::Vector2f targetPos = slots[1][0]->GetPosition();
+//    Move(dt, objectArr[0][1], targetPos, 10.f, MoveType::Lerp);
+//
+//    if (Utils::Distance(objectArr[0][1]->GetPosition(), targetPos) <= 0.1f)
+//    {
+//        objectArr[0][1]->SetPosition(targetPos);
+//        objectArr[0][1]->SetIndex({1, 0});
+//        objectArr[1][0] = objectArr[0][1];
+//        objectArr[0][1] = nullptr;
+//    }
+//}
 
 	swapCountTxt->SetString(std::to_string(swapCount));
 
@@ -172,6 +175,21 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 	obj->SetPosition(pos);
 }
 
+// 아래가 비어있는지 체크
+bool SceneDev2::Test(const Object* obj)
+{
+	if (obj == nullptr)
+		return false;
+
+	sf::Vector2i curIdx = obj->GetIndex();
+
+	if (curIdx.x >= 6 || mapList[curIdx.x][curIdx.y] == 0)
+		return false;
+
+	if (objectArr[curIdx.x + 1][curIdx.y] == nullptr)
+		return true;
+}
+
 // 아래가 비어있는지 체크 후 아래로 내려가도록 함
 void SceneDev2::MoveDown(float dt)
 {
@@ -193,25 +211,29 @@ void SceneDev2::MoveDown(float dt)
 			if (objectArr[j][i]->GetIsMove())
 			{
 				int newRow = j + fallCount;
-				sf::Vector2f targetPos = slots[newRow][i]->GetPosition();
 
-				Move(dt, objectArr[j][i], targetPos, 10.f, MoveType::Lerp);
+				ChangeObj(objectArr[j][i], newRow, i);
 
-				if (Utils::Distance(objectArr[j][i]->GetPosition(), targetPos) <= 0.1f)
+				sf::Vector2i newIdx = objectArr[newRow][i]->GetIndex();
+				sf::Vector2f targetPos = slots[newIdx.x][newIdx.y]->GetPosition();
+				Move(dt, objectArr[newRow][i], targetPos, 10.f, MoveType::Lerp);
+
+				if (Utils::Distance(objectArr[newRow][i]->GetPosition(), targetPos) <= 0.1f)
 				{
-					objectArr[j][i]->SetIndex({ newRow, i });
-					objectArr[newRow][i] = objectArr[j][i];
-					objectArr[j][i] = nullptr;
+					//objectArr[j][i]->SetIndex({ newRow, i });
+					//objectArr[newRow][i] = objectArr[j][i];
+					//objectArr[j][i] = nullptr;
 					objectArr[newRow][i]->SetIsMove(false);
+					fallCount = 0;
 				}
 				continue;
 			}
 			else if (fallCount > 0)
 			{
-				int newRow = j + fallCount;
-				sf::Vector2f targetPos = slots[newRow][i]->GetPosition();
+				//int newRow = j + fallCount;
+				//sf::Vector2f targetPos = slots[newRow][i]->GetPosition();
 
-				Move(dt, objectArr[j][i], targetPos, 10.f, MoveType::Lerp);
+				//Move(dt, objectArr[j][i], targetPos, 10.f, MoveType::Lerp);
 				objectArr[j][i]->SetIsMove(true);
 			}
 		}
@@ -305,13 +327,7 @@ void SceneDev2::CreateObjs()
 		{
 			if (mapList[i][j])
 			{
-				Object* object = (Object*)AddGameObject(new Object());
-				object->Init();
-				object->Reset();
-				object->SetActive(true);
-				object->SetPosition(slots[i][j]->GetPosition());
-				object->SetIndex(sf::Vector2i(i, j));
-				objectArr[i][j] = object;
+				SpawnObj(i, j);
 
 				if (j > 1 && objectArr[i][j - 1] != nullptr)
 				{
@@ -331,6 +347,37 @@ void SceneDev2::CreateObjs()
 			}
 		}
 	}
+}
+
+// 오브젝트 정보 변경 (obj[i][j] to obj[x][y])
+void SceneDev2::ChangeObj(Object* obj, int x, int y)
+{
+	// 오브젝트가 들어있는 배열의 값 교환
+	sf::Vector2i index = obj->GetIndex();
+
+	if (index.x == x && index.y == y)
+		return;
+
+	objectArr[x][y] = objectArr[index.x][index.y];
+
+	// 오브젝트 내부의 인덱스 변경
+	obj->SetIndex(sf::Vector2i(x, y));
+
+	// 기존 오브젝트 정보 제거
+	objectArr[index.x][index.y] = nullptr;
+}
+
+// 오브젝트 1개 생성
+void SceneDev2::SpawnObj(int idx1, int idx2)
+{
+	Object* object = (Object*)AddGameObject(new Object());
+	object->Init();
+	object->Reset();
+	object->SetActive(true);
+	object->SetPosition(slots[idx1][idx2]->GetPosition());
+	// 정보 수정
+	object->SetIndex(sf::Vector2i(idx1, idx2));
+	objectArr[idx1][idx2] = object;
 }
 
 // 오브젝트 선택
