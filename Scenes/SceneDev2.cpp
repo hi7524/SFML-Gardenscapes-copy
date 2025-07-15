@@ -57,10 +57,27 @@ void SceneDev2::Enter()
 
 void SceneDev2::Update(float dt)
 {
+	isMovingObjs = false;
+
+	for (int i = 0; i < 7; i++)
+	{
+		for (int j = 0; j < 7; j++)
+		{
+			if (objectArr[i][j] != nullptr && objectArr[i][j]->GetIsMove())
+			{
+				isMovingObjs = true;
+				break;
+			}
+		}
+		if (isMovingObjs) break;
+	}
+
+	//std::cout << isMovingObjs << std::endl;
 	if (!isMovingObjs)
 	{
 		MouseOnObj();
 	}
+
 
 	// 두개 모두 선택한 경우
 	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
@@ -127,33 +144,38 @@ void SceneDev2::Update(float dt)
 			else
 			{
 				objectArr[0][i]->SetPosition(targetPos);
+				objectArr[0][i]->SetIsMove(false);
 			}
 		}
 
 		if (allReached)
 		{
-			isMovingObjs = false;
 			isSpawning = false;
 		}
 	}
 
 	// 대각선 이동
-//if (objectArr[0][1] != nullptr && objectArr[1][0] == nullptr)
-//{
-//    sf::Vector2f targetPos = slots[1][0]->GetPosition();
-//    Move(dt, objectArr[0][1], targetPos, 10.f, MoveType::Lerp);
-//
-//    if (Utils::Distance(objectArr[0][1]->GetPosition(), targetPos) <= 0.1f)
-//    {
-//        objectArr[0][1]->SetPosition(targetPos);
-//        objectArr[0][1]->SetIndex({1, 0});
-//        objectArr[1][0] = objectArr[0][1];
-//        objectArr[0][1] = nullptr;
-//    }
-//}
+	if (objectArr[0][1] != nullptr
+		&& Utils::Distance(objectArr[0][1]->GetPosition(), slots[0][1]->GetPosition()) < 0.5f
+		&& objectArr[1][0] == nullptr)
+	{
+		ChangeObj(objectArr[0][1], 1, 0);
+
+		sf::Vector2f targetPos = slots[1][0]->GetPosition();
+		Move(dt, objectArr[1][0], targetPos, 10.f, MoveType::Lerp);
+	}
+
+	if (objectArr[0][5] != nullptr
+		&& Utils::Distance(objectArr[0][5]->GetPosition(), slots[0][5]->GetPosition()) < 0.5f
+		&& objectArr[1][6] == nullptr)
+	{
+		ChangeObj(objectArr[0][5], 1, 6);
+
+		sf::Vector2f targetPos = slots[1][6]->GetPosition();
+		Move(dt, objectArr[1][6], targetPos, 10.f, MoveType::Lerp);
+	}
 
 	swapCountTxt->SetString(std::to_string(swapCount));
-
 	Scene::Update(dt);
 }
 
@@ -178,13 +200,11 @@ bool SceneDev2::IsSwappable(const Object* a, const Object* b)
 
 void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType)
 {
-	isMovingObjs = true;
 	obj->SetIsMove(true);
 
 	if (Utils::Distance(targetPos, obj->GetPosition()) <= 0.5f)
 	{
 		obj->SetPosition(targetPos);
-		isMovingObjs = false;
 		obj->SetIsMove(false);
 		return;
 	}
@@ -203,21 +223,6 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 
 	obj->SetPosition(pos);
 }
-
-//// 아래가 비어있는지 체크
-//bool SceneDev2::Test(const Object* obj)
-//{
-//	if (obj == nullptr)
-//		return false;
-//
-//	sf::Vector2i curIdx = obj->GetIndex();
-//
-//	if (curIdx.x >= 6 || mapList[curIdx.x][curIdx.y] == 0)
-//		return false;
-//
-//	if (objectArr[curIdx.x + 1][curIdx.y] == nullptr)
-//		return true;
-//}
 
 // 아래가 비어있는지 체크 후 아래로 내려가도록 함
 void SceneDev2::MoveDown(float dt)
@@ -301,7 +306,7 @@ void SceneDev2::SwapObjs(float dt)
 			swapCount--;
 
 			// 매치 여부 검사
-			CheckLineMatch();
+			//CheckLineMatch();
 		}
 	}
 }
