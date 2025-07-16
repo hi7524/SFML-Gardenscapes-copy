@@ -77,7 +77,7 @@ void SceneDev2::Update(float dt)
 	}
 	else if (state == GameState::Swapping)
 	{
-		TryToSwap(dt);
+		SwapObjs(dt);
 	}
 	else if (state == GameState::CheckingMatchSwap)
 	{
@@ -276,21 +276,6 @@ void SceneDev2::MoveDown(float dt)
 	}
 }
 
-// 스왑 시도
-void SceneDev2::TryToSwap(float dt)
-{
-	SwapObjs(dt);
-	CheckLineMatch();
-
-	if (matchObjs.size() > 0)
-	{
-		clearClickedInfo();
-	}
-	else
-	{
-		SwapObjs(dt);
-	}
-}
 
 void SceneDev2::clearClickedInfo()
 {
@@ -348,7 +333,7 @@ void SceneDev2::SwapObjs(float dt)
 			{
 				clearClickedInfo();
 				swapCount--;
-				canvas->SetSwapCountTxt(swapCount);
+				canvas->SetSwapCountText(swapCount);
 			}
 			else
 			{
@@ -625,6 +610,17 @@ void SceneDev2::DeleteMatchObjs()
 
 	for (auto obj : matchObjs)
 	{
+		if (obj->GetType() == ObjectType::Diamond)
+		{
+			remainingTargetCount--;
+			if (remainingTargetCount < 0)
+			{
+				remainingTargetCount = 0;
+				std::cout << "스테이지 클리어" << std::endl;
+			}
+			canvas->SetObjCountText(remainingTargetCount);
+		}
+
 		if (obj != nullptr)
 		{
 			obj->SetActive(false);

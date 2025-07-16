@@ -6,6 +6,8 @@ class UiCanvas : public GameObject
 {
 private:
 	sf::Text swapCountText;
+	sf::Text objCountText;
+	SpriteGo diamondSprite;
 
 public:
 	UiCanvas(const std::string& name = "");
@@ -17,5 +19,6 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
-	void SetSwapCountTxt(int count);
+	void SetSwapCountText(int count);
+	void SetObjCountText(int count);
 };

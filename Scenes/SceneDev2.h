@@ -35,6 +35,7 @@ protected:
 	bool isReverting = false;
 
 	int swapCount = 22;
+	int remainingTargetCount = 16;
 
 	bool isMovingObjs = false; // 오브젝트 움직이고 있는중인지 저장할 bool변수
 	bool isSpawning = false;
@@ -62,7 +63,6 @@ public:
 	void Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType);
 	//bool Test(const Object* obj);
 	void MoveDown(float dt);
-	void TryToSwap(float dt);
 	void clearClickedInfo();
 	void SwapObjs(float dt);
 	void CreateSlots();
