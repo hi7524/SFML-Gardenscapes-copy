@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Animator.h"
 
 class Object : public GameObject
 {
@@ -10,6 +11,7 @@ protected:
 	bool isActive = true;
 	bool isMoving = false;
 	sf::Vector2i index = { -1, -1 }; // 현재 저장되어있는 인덱스를 저장할 변수, 위치 아님
+	Animator animator;
 
 public:
 	Object(const std::string& name = "");
@@ -36,6 +38,8 @@ public:
 	bool GetActive() const { return isActive; }
 	void SetIsMove(bool move) { isMoving = move; }
 	bool GetIsMove() const { return isMoving; }
+
+	void PlayClearEffect();
 
 	sf::FloatRect GetGlobalBounds() const override
 	{

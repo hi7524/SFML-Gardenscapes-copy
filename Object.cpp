@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Object.h"
+#include "Animator.h"
 
 Object::Object(const std::string& name)
 	: GameObject(name)
@@ -46,6 +47,8 @@ void Object::Init()
 	sortingOrder = 5;
 
 	object.setTexture(TEXTURE_MGR.Get(texId));
+
+	animator.SetTarget(&object);
 }
 
 void Object::Release()
@@ -62,6 +65,7 @@ void Object::Reset()
 
 void Object::Update(float dt)
 {
+	animator.Update(dt);
 }
 
 void Object::Draw(sf::RenderWindow& window)
@@ -108,4 +112,9 @@ void Object::SetRandomType()
 		objectType = ObjectType::None;
 		break;
 	}
+}
+
+void Object::PlayClearEffect()
+{
+	animator.Play("animations/effect.csv");
 }

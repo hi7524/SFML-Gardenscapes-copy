@@ -17,8 +17,11 @@ void UiCanvas::Release()
 
 void UiCanvas::Reset()
 {
+	sf::Vector2f windowSize = FRAMEWORK.GetWindowSizeF();
+
 	swapCountText.setFont(FONT_MGR.Get("fonts/minecraft_font.ttf"));
 	objCountText.setFont(FONT_MGR.Get("fonts/minecraft_font.ttf"));
+	stageClearText.setFont(FONT_MGR.Get("fonts/minecraft_font.ttf"));
 
 	diamondSprite.SetTextureId("graphics/diamond.png");
 	diamondSprite.Reset();
@@ -38,6 +41,12 @@ void UiCanvas::Reset()
 	swapCountText.setCharacterSize(25);
 	swapCountText.setPosition({ 100.f, 400.f });
 	Utils::SetOrigin(swapCountText, Origins::MC);
+
+	stageClearText.setString("Stage1 Clear");
+	stageClearText.setFillColor(sf::Color::Yellow);
+	stageClearText.setCharacterSize(40);
+	stageClearText.setPosition(windowSize * 0.5f);
+	Utils::SetOrigin(stageClearText, Origins::MC);
 }
 
 void UiCanvas::Update(float dt)
@@ -50,6 +59,7 @@ void UiCanvas::Draw(sf::RenderWindow& window)
 	diamondSprite.Draw(window);
 	window.draw(objCountText);
 	window.draw(swapCountText);
+	//window.draw(stageClearText);
 }
 
 void UiCanvas::SetSwapCountText(int count)

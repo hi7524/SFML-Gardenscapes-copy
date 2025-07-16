@@ -3,6 +3,7 @@
 #include "Slot.h"
 #include "Object.h"
 #include "UiCanvas.h"
+#include "Animator.h"
 
 SceneDev2::SceneDev2()
 	: Scene(SceneIds::Dev2)
@@ -26,6 +27,7 @@ void SceneDev2::Init()
 	texIds.push_back("graphics/lava.png");
 	texIds.push_back("graphics/potato.png");
 	texIds.push_back("graphics/background.png");
+	texIds.push_back("graphics/effects.png");
 
 	fontIds.push_back("fonts/minecraft_font.ttf");
 
@@ -35,6 +37,8 @@ void SceneDev2::Init()
 void SceneDev2::Enter()
 {
 	Scene::Enter();
+
+	ANI_CLIP_MGR.Load("animations/effect.csv");
 
 	SpriteGo* background = new SpriteGo("graphics/background.png");
 	background->Init();

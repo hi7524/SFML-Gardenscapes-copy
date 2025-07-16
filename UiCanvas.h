@@ -9,6 +9,8 @@ private:
 	sf::Text objCountText;
 	SpriteGo diamondSprite;
 
+	sf::Text stageClearText;
+
 public:
 	UiCanvas(const std::string& name = "");
 	~UiCanvas() override = default;
