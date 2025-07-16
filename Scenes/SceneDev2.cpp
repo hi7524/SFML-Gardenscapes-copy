@@ -308,8 +308,6 @@ void SceneDev2::clearClickedInfo()
 	// √ ±‚»≠
 	selectedObj1 = nullptr;
 	selectedObj2 = nullptr;
-	curObj1 = nullptr;
-	curObj2 = nullptr;
 	selectedObj1Pos = vectorZero;
 	selectedObj2Pos = vectorZero;
 	isSwapped = false;

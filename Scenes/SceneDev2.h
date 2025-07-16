@@ -25,8 +25,6 @@ protected:
 
 	Object* selectedObj1 = nullptr; // 교환할 두 오브젝트 1
 	Object* selectedObj2 = nullptr; // 교환할 두 오브젝트 1
-	Object* curObj1 = nullptr;
-	Object* curObj2 = nullptr;
 
 	sf::Vector2f selectedObj1Pos = { 0.f, 0.f };
 	sf::Vector2f selectedObj2Pos = { 0.f, 0.f };
