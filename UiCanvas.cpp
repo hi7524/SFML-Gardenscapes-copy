@@ -22,7 +22,7 @@ void UiCanvas::Reset()
 	swapCountText.setString("22");
 	swapCountText.setFillColor(sf::Color::White);
 	swapCountText.setCharacterSize(25);
-	swapCountText.setPosition({ 100.f, 500.f });
+	swapCountText.setPosition({ 100.f, 400.f });
 	Utils::SetOrigin(swapCountText, Origins::MC);
 }
 
@@ -38,5 +38,5 @@ void UiCanvas::Draw(sf::RenderWindow& window)
 
 void UiCanvas::SetSwapCountTxt(int count)
 {
-	
+	swapCountText.setString(std::to_string(count));
 }

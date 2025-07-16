@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "SpriteGo.h"
 
 class UiCanvas : public GameObject
 {

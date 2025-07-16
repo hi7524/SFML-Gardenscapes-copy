@@ -348,6 +348,7 @@ void SceneDev2::SwapObjs(float dt)
 			{
 				clearClickedInfo();
 				swapCount--;
+				canvas->SetSwapCountTxt(swapCount);
 			}
 			else
 			{
