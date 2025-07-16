@@ -58,140 +58,23 @@ void SceneDev2::Update(float dt)
 	// 대기 및 입력
 	if (state == GameState::Idle)
 	{
-		if (!isMovingObjs)
-		{
-			MouseOnObj();
-			DragObj();
-		}
-
-
-		// 두개 모두 선택한 경우
-		if (selectedObj1 != nullptr && selectedObj2 != nullptr)
-		{
-			if (IsSwappable(selectedObj1, selectedObj2))
-			{
-				state = GameState::Swapping;
-			}
-			else
-			{
-				selectedObj1 = nullptr;
-				selectedObj2 = nullptr;
-			}
-		}
+		UpdateIdle();
 	}
 	else if (state == GameState::Swapping)
 	{
-		SwapObjs(dt);
+		UpdateSwapping(dt);
 	}
 	else if (state == GameState::CheckingMatchSwap)
 	{
-		CheckLineMatch();
-		DeleteMatchObjs();
-		state = GameState::Moving;
+		UpdateCheckingMatchSwap();
 	}
 	else if (state == GameState::Moving)
 	{
-		MoveDown(dt);
-
-		// 대각선 이동
-		if (objectArr[0][1] != nullptr
-			&& Utils::Distance(objectArr[0][1]->GetPosition(), slots[0][1]->GetPosition()) < 0.5f
-			&& objectArr[1][0] == nullptr)
-		{
-			ChangeObj(objectArr[0][1], 1, 0);
-
-			sf::Vector2f targetPos = slots[1][0]->GetPosition();
-			Move(dt, objectArr[1][0], targetPos, 10.f, MoveType::Lerp);
-		}
-
-		if (objectArr[0][5] != nullptr
-			&& Utils::Distance(objectArr[0][5]->GetPosition(), slots[0][5]->GetPosition()) < 0.5f
-			&& objectArr[1][6] == nullptr)
-		{
-			ChangeObj(objectArr[0][5], 1, 6);
-
-			sf::Vector2f targetPos = slots[1][6]->GetPosition();
-			Move(dt, objectArr[1][6], targetPos, 10.f, MoveType::Lerp);
-		}
-
-		for (int i = 0; i < 7; i++)
-		{
-			if (mapList[0][i] == 0 || slots[0][i] == nullptr)
-				continue;
-
-			if (objectArr[0][i] != nullptr)
-			{
-				if (objectArr[0][i]->GetIsMove())
-					continue;
-			}
-
-			if (slots[0][i] != nullptr && objectArr[0][i] == nullptr)
-			{
-				Object* object = (Object*)AddGameObject(new Object());
-				object->Init();
-				object->Reset();
-				object->SetActive(true);
-				object->SetPosition({ slots[0][i]->GetPosition().x, slots[0][i]->GetPosition().y - 64 });
-				object->SetIndex(sf::Vector2i(0, i));
-				objectArr[0][i] = object;
-				isSpawning = true;
-			}
-		}
-
-		if (isSpawning)
-		{
-			bool allReached = true;
-
-			for (int i = 0; i < 7; i++)
-			{
-				if (objectArr[0][i] == nullptr)
-					continue;
-
-				sf::Vector2f targetPos = slots[objectArr[0][i]->GetIndex().x][objectArr[0][i]->GetIndex().y]->GetPosition();
-				if (Utils::Distance(objectArr[0][i]->GetPosition(), targetPos) >= 0.5f)
-				{
-					Move(dt, objectArr[0][i], targetPos, 15.f, MoveType::Default);
-					allReached = false;
-				}
-				else
-				{
-					objectArr[0][i]->SetPosition(targetPos);
-					objectArr[0][i]->SetIsMove(false);
-				}
-			}
-
-			if (allReached)
-			{
-				isSpawning = false;
-			}
-		}
-
-		if (IsAllObjectsStopped())
-		{
-			frameCount++;
-		}
-		else
-		{
-			frameCount = 0;
-		}
-
-		if (frameCount >= 3)
-		{
-			state = GameState::CheckingMatchMove;
-		}
+		UpdateMoving(dt);
 	}
 	else if (state == GameState::CheckingMatchMove)
 	{
-		CheckLineMatch();
-		if (matchObjs.size() > 0)
-		{
-			DeleteMatchObjs();
-			state = GameState::Moving;
-		}
-		else
-		{
-			state = GameState::Idle;
-		}
+		UpdateCheckingMatchMove();
 	}
 
 	Scene::Update(dt);
@@ -201,6 +84,150 @@ void SceneDev2::Draw(sf::RenderWindow& window)
 {
 	Scene::Draw(window);
 }
+
+
+void SceneDev2::UpdateIdle()
+{
+	if (!isMovingObjs)
+	{
+		MouseOnObj();
+		DragObj();
+	}
+
+
+	// 두개 모두 선택한 경우
+	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
+	{
+		if (IsSwappable(selectedObj1, selectedObj2))
+		{
+			state = GameState::Swapping;
+		}
+		else
+		{
+			selectedObj1 = nullptr;
+			selectedObj2 = nullptr;
+		}
+	}
+}
+
+void SceneDev2::UpdateSwapping(float dt)
+{
+	SwapObjs(dt);
+}
+
+void SceneDev2::UpdateCheckingMatchSwap()
+{
+	CheckLineMatch();
+	DeleteMatchObjs();
+	state = GameState::Moving;
+}
+
+void SceneDev2::UpdateMoving(float dt)
+{
+	MoveDown(dt);
+
+	// 대각선 이동
+	if (objectArr[0][1] != nullptr
+		&& Utils::Distance(objectArr[0][1]->GetPosition(), slots[0][1]->GetPosition()) < 0.5f
+		&& objectArr[1][0] == nullptr)
+	{
+		ChangeObj(objectArr[0][1], 1, 0);
+
+		sf::Vector2f targetPos = slots[1][0]->GetPosition();
+		Move(dt, objectArr[1][0], targetPos, 10.f, MoveType::Lerp);
+	}
+
+	if (objectArr[0][5] != nullptr
+		&& Utils::Distance(objectArr[0][5]->GetPosition(), slots[0][5]->GetPosition()) < 0.5f
+		&& objectArr[1][6] == nullptr)
+	{
+		ChangeObj(objectArr[0][5], 1, 6);
+
+		sf::Vector2f targetPos = slots[1][6]->GetPosition();
+		Move(dt, objectArr[1][6], targetPos, 10.f, MoveType::Lerp);
+	}
+
+	for (int i = 0; i < 7; i++)
+	{
+		if (mapList[0][i] == 0 || slots[0][i] == nullptr)
+			continue;
+
+		if (objectArr[0][i] != nullptr)
+		{
+			if (objectArr[0][i]->GetIsMove())
+				continue;
+		}
+
+		if (slots[0][i] != nullptr && objectArr[0][i] == nullptr)
+		{
+			Object* object = (Object*)AddGameObject(new Object());
+			object->Init();
+			object->Reset();
+			object->SetActive(true);
+			object->SetPosition({ slots[0][i]->GetPosition().x, slots[0][i]->GetPosition().y - 64 });
+			object->SetIndex(sf::Vector2i(0, i));
+			objectArr[0][i] = object;
+			isSpawning = true;
+		}
+	}
+
+	if (isSpawning)
+	{
+		bool allReached = true;
+
+		for (int i = 0; i < 7; i++)
+		{
+			if (objectArr[0][i] == nullptr)
+				continue;
+
+			sf::Vector2f targetPos = slots[objectArr[0][i]->GetIndex().x][objectArr[0][i]->GetIndex().y]->GetPosition();
+			if (Utils::Distance(objectArr[0][i]->GetPosition(), targetPos) >= 0.5f)
+			{
+				Move(dt, objectArr[0][i], targetPos, 15.f, MoveType::Default);
+				allReached = false;
+			}
+			else
+			{
+				objectArr[0][i]->SetPosition(targetPos);
+				objectArr[0][i]->SetIsMove(false);
+			}
+		}
+
+		if (allReached)
+		{
+			isSpawning = false;
+		}
+	}
+
+	if (IsAllObjectsStopped())
+	{
+		frameCount++;
+	}
+	else
+	{
+		frameCount = 0;
+	}
+
+	if (frameCount >= 3)
+	{
+		state = GameState::CheckingMatchMove;
+	}
+}
+
+void SceneDev2::UpdateCheckingMatchMove()
+{
+	CheckLineMatch();
+	if (matchObjs.size() > 0)
+	{
+		DeleteMatchObjs();
+		state = GameState::Moving;
+	}
+	else
+	{
+		state = GameState::Idle;
+	}
+}
+
 
 // 두 오브젝트 스왑 조건 확인
 bool SceneDev2::IsSwappable(const Object* a, const Object* b)
