@@ -25,10 +25,15 @@ protected:
 
 	Object* selectedObj1 = nullptr; // 교환할 두 오브젝트 1
 	Object* selectedObj2 = nullptr; // 교환할 두 오브젝트 1
+	Object* curObj1 = nullptr;
+	Object* curObj2 = nullptr;
 
 	sf::Vector2f selectedObj1Pos = { 0.f, 0.f };
 	sf::Vector2f selectedObj2Pos = { 0.f, 0.f };
 	sf::Vector2f vectorZero = { 0.f, 0.f };
+
+	bool isSwapped = false;
+	bool isReverting = false;
 
 	int swapCount = 22;
 	TextGo* swapCountTxt = new TextGo("fonts/minecraft_font.ttf"); // 나중에 canvas 추가하면 거기로 옮기기
@@ -41,8 +46,6 @@ protected:
 	GameState state = GameState::Idle;
 
 	int frameCount = 0;
-
-	bool test = false;
 
 public:
 	SceneDev2();

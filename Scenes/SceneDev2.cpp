@@ -308,11 +308,13 @@ void SceneDev2::clearClickedInfo()
 	// 초기화
 	selectedObj1 = nullptr;
 	selectedObj2 = nullptr;
+	curObj1 = nullptr;
+	curObj2 = nullptr;
 	selectedObj1Pos = vectorZero;
 	selectedObj2Pos = vectorZero;
+	isSwapped = false;
+	isReverting = false;
 
-	// 스왑 카운트 감소
-	swapCount--;
 
 	// 매치 여부 검사
 	//CheckLineMatch();
@@ -322,22 +324,24 @@ void SceneDev2::clearClickedInfo()
 // 오브젝트 스왑
 void SceneDev2::SwapObjs(float dt)
 {
-	if (swapCount > 0)
-	{
-		if (selectedObj1Pos == vectorZero && selectedObj2Pos == vectorZero)
-		{
-			selectedObj1Pos = selectedObj1->GetPosition();
-			selectedObj2Pos = selectedObj2->GetPosition();
-		}
+	if (swapCount <= 0 || selectedObj1 == nullptr || selectedObj2 == nullptr)
+		return;
 
-		// 이동
+	if (selectedObj1Pos == vectorZero && selectedObj2Pos == vectorZero)
+	{
+		selectedObj1Pos = selectedObj1->GetPosition();
+		selectedObj2Pos = selectedObj2->GetPosition();
+	}
+
+	// 스왑 완료 전
+	if (!isSwapped)
+	{
 		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj2Pos, dt * 9.f);
 		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj1Pos, dt * 9.f);
 
 		selectedObj1->SetPosition(nextPos1);
 		selectedObj2->SetPosition(nextPos2);
 
-		// 근사치에 도달했을 경우 정보 변경
 		if (Utils::Distance(nextPos1, selectedObj2Pos) <= 0.5f && Utils::Distance(nextPos2, selectedObj1Pos) <= 0.5f)
 		{
 			// 위치 설정
@@ -349,14 +353,45 @@ void SceneDev2::SwapObjs(float dt)
 			sf::Vector2i index2 = selectedObj2->GetIndex();
 			selectedObj1->SetIndex(index2);
 			selectedObj2->SetIndex(index1);
-
-			// 오브젝트가 들어있는 배열의 값 교환
 			std::swap(objectArr[index1.x][index1.y], objectArr[index2.x][index2.y]);
 
-			selectedObj1Pos = vectorZero;
-			selectedObj2Pos = vectorZero;
+			// 매치 체크
+			CheckLineMatch();
+			isSwapped = true;
 
-			test = true;
+			// 매치가 없으면 복구
+			if (matchObjs.size() > 0)
+			{
+				clearClickedInfo();
+				swapCount--;
+			}
+			else
+			{
+				isReverting = true;
+			}
+		}
+	}
+	// 복구
+	else if (isReverting)
+	{
+		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj1Pos, dt * 9.f);
+		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj2Pos, dt * 9.f);
+
+		selectedObj1->SetPosition(nextPos1);
+		selectedObj2->SetPosition(nextPos2);
+
+		if (Utils::Distance(nextPos1, selectedObj1Pos) <= 0.5f && Utils::Distance(nextPos2, selectedObj2Pos) <= 0.5f)
+		{
+			selectedObj1->SetPosition(selectedObj1Pos);
+			selectedObj2->SetPosition(selectedObj2Pos);
+
+			sf::Vector2i index1 = selectedObj1->GetIndex();
+			sf::Vector2i index2 = selectedObj2->GetIndex();
+			selectedObj1->SetIndex(index2);
+			selectedObj2->SetIndex(index1);
+			std::swap(objectArr[index1.x][index1.y], objectArr[index2.x][index2.y]);
+
+			clearClickedInfo();
 		}
 	}
 }
