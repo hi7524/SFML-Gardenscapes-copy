@@ -45,6 +45,9 @@ protected:
 
 	int frameCount = 0;
 
+
+	sf::Vector2f dragStartPos = { 0.f, 0.f };
+
 public:
 	SceneDev2();
 	~SceneDev2() override = default;
@@ -72,6 +75,6 @@ public:
 	void DeleteMatchObjs();
 	bool IsEmptyBelow(int c, int r);
 	bool IsAllObjectsStopped();
-	//void DragObj();
+	void DragObj();
 	//void SwapObjs(float dt);
 };
