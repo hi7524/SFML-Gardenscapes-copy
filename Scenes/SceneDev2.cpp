@@ -2,6 +2,7 @@
 #include "SceneDev2.h"
 #include "Slot.h"
 #include "Object.h"
+#include "UiCanvas.h"
 
 SceneDev2::SceneDev2()
 	: Scene(SceneIds::Dev2)
@@ -14,6 +15,8 @@ void SceneDev2::Init()
 	sf::Vector2f windowSize = FRAMEWORK.GetWindowSizeF();
 	worldView.setSize(windowSize);
 	worldView.setCenter(windowSize * 0.5f);
+	uiView.setSize(windowSize);
+	uiView.setCenter(windowSize * 0.5f);
 
 	// 리소스
 	texIds.push_back("graphics/slot.png");
@@ -38,16 +41,9 @@ void SceneDev2::Enter()
 	background->Reset();
 	AddGameObject(background);
 
-	swapCountTxt = new TextGo("fonts/minecraft_font.ttf");
-
-	swapCountTxt->Init();
-	swapCountTxt->Reset();
-
-	swapCountTxt->SetString("22");
-	swapCountTxt->SetFillColor(sf::Color::White);
-	swapCountTxt->SetCharacterSize(25);
-	swapCountTxt->SetPosition({ 100.f, 100.f });
-	AddGameObject(swapCountTxt);
+	canvas = (UiCanvas*)AddGameObject(new UiCanvas());
+	canvas->Init();
+	canvas->Reset();
 
 	CreateSlots(); // 초기 슬롯 생성
 	CreateObjs(); // 초기 오브젝트 생성
@@ -194,7 +190,6 @@ void SceneDev2::Update(float dt)
 		}
 	}
 
-	swapCountTxt->SetString(std::to_string(swapCount));
 	Scene::Update(dt);
 }
 

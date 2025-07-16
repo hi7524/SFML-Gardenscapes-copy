@@ -3,6 +3,7 @@
 
 class Slot;
 class Object;
+class UiCanvas;
 
 class SceneDev2 : public Scene
 {
@@ -34,7 +35,6 @@ protected:
 	bool isReverting = false;
 
 	int swapCount = 22;
-	TextGo* swapCountTxt = new TextGo("fonts/minecraft_font.ttf"); // 나중에 canvas 추가하면 거기로 옮기기
 
 	bool isMovingObjs = false; // 오브젝트 움직이고 있는중인지 저장할 bool변수
 	bool isSpawning = false;
@@ -45,8 +45,9 @@ protected:
 
 	int frameCount = 0;
 
-
 	sf::Vector2f dragStartPos = { 0.f, 0.f };
+
+	UiCanvas* canvas;
 
 public:
 	SceneDev2();
