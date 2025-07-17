@@ -54,7 +54,6 @@ enum class GameState
 {
 	Idle,
 	Swapping,
-	CheckingMatchSwap,
+	CheckingMatch,
 	Moving,
-	CheckingMatchMove,
 };

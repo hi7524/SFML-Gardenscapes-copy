@@ -64,17 +64,13 @@ void SceneDev2::Update(float dt)
 	{
 		UpdateSwapping(dt);
 	}
-	else if (state == GameState::CheckingMatchSwap)
+	else if (state == GameState::CheckingMatch)
 	{
-		UpdateCheckingMatchSwap();
+		UpdateCheckingMatch();
 	}
 	else if (state == GameState::Moving)
 	{
 		UpdateMoving(dt);
-	}
-	else if (state == GameState::CheckingMatchMove)
-	{
-		UpdateCheckingMatchMove();
 	}
 
 	Scene::Update(dt);
@@ -93,7 +89,6 @@ void SceneDev2::UpdateIdle()
 		MouseOnObj();
 		DragObj();
 	}
-
 
 	// 두개 모두 선택한 경우
 	if (selectedObj1 != nullptr && selectedObj2 != nullptr)
@@ -124,29 +119,35 @@ void SceneDev2::UpdateSwapping(float dt)
 	}
 }
 
-void SceneDev2::UpdateCheckingMatchSwap()
+void SceneDev2::UpdateCheckingMatch()
 {
-	if (matchObjs.size() > 0)
+	if (matchObjs.empty())
 	{
-		bool animAllStop = true;
+		CheckLineMatch();
+	}
 
-		for (auto obj : matchObjs)
-		{
-			if (obj->IsPlaying())
-			{
-				animAllStop = false;
-				break;
-			}
-		}
+	if (matchObjs.empty())
+	{
+		state = GameState::Idle;
+		return;
+	}
 
-		if (animAllStop)
+	bool animAllStop = true;
+	for (auto obj : matchObjs)
+	{
+		if (obj->IsPlaying())
 		{
-			DeleteMatchObjs();
-			state = GameState::Moving;
+			animAllStop = false;
+			break;
 		}
 	}
-}
 
+	if (animAllStop)
+	{
+		DeleteMatchObjs();
+		state = GameState::Moving;
+	}
+}
 void SceneDev2::UpdateMoving(float dt)
 {
 	MoveDown(dt);
@@ -235,24 +236,9 @@ void SceneDev2::UpdateMoving(float dt)
 
 	if (frameCount >= 3)
 	{
-		state = GameState::CheckingMatchMove;
+		state = GameState::CheckingMatch;
 	}
 }
-
-void SceneDev2::UpdateCheckingMatchMove()
-{
-	CheckLineMatch();
-	if (matchObjs.size() > 0)
-	{
-		DeleteMatchObjs();
-		state = GameState::Moving;
-	}
-	else
-	{
-		state = GameState::Idle;
-	}
-}
-
 
 // 두 오브젝트 스왑 조건 확인
 bool SceneDev2::IsSwappable(const Object* a, const Object* b)
@@ -343,7 +329,7 @@ void SceneDev2::clearClickedInfo()
 	isSwapped = false;
 	isReverting = false;
 
-	state = GameState::CheckingMatchSwap;
+	state = GameState::CheckingMatch;
 }
 
 // 오브젝트 스왑

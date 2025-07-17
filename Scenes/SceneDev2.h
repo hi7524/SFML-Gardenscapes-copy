@@ -61,9 +61,8 @@ public:
 
 	void UpdateIdle();
 	void UpdateSwapping(float dt);
-	void UpdateCheckingMatchSwap();
+	void UpdateCheckingMatch();
 	void UpdateMoving(float dt);
-	void UpdateCheckingMatchMove();
 
 	bool IsSwappable(const Object* a, const Object* b);
 	void Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType);
