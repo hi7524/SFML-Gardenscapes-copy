@@ -1,21 +1,19 @@
 #pragma once
 #include "GameObject.h"
 
-class SpriteGo : public GameObject
+class ButtonGo : public GameObject
 {
 protected:
 	sf::Sprite sprite;
-	std::string textureId;
+	std::string spriteId = "graphics/button.png";
+	std::string highlightedSpriteId = "graphics/buttonHighlighted.png";
+	sf::Text text;
+
+	std::function<void()> onClick;
 
 public:
-	SpriteGo(const std::string& texPlayerId = "", const std::string& name = "");
-	~SpriteGo() override = default;
-
-	const std::string& GetTextureId() const { return textureId; }
-	void SetTextureId(const std::string& texPlayerId) { textureId = texPlayerId; }
-
-	sf::Sprite& GetSprite() { return sprite; }
-	const sf::Sprite& GetSprite() const { return sprite; }
+	ButtonGo(const std::string& name = "");
+	virtual ~ButtonGo() = default;
 
 	void SetPosition(const sf::Vector2f& pos) override;
 	void SetRotation(float rot) override;
@@ -28,6 +26,13 @@ public:
 	void Reset() override;
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
+
+	void SetText(std::string s);
+	void OriginSprite();
+	void HighlighteSprite();
+
+	void SetOnClick(const std::function<void()>& callback);
+	void OnClick();
 
 	sf::FloatRect GetGlobalBounds() const override
 	{
