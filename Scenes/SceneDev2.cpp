@@ -79,7 +79,11 @@ void SceneDev2::Update(float dt)
 	}
 	else if (state == GameState::CheckMatch)
 	{
-		UpdateCheckingMatch();
+		UpdateCheckingMatch(dt);
+	}
+	else if (state == GameState::CheckObj)
+	{
+		Test(dt);
 	}
 	else if (state == GameState::Animation)
 	{
@@ -131,13 +135,40 @@ void SceneDev2::UpdateSwapping(float dt)
 	SwapObjs(dt);
 }
 
-void SceneDev2::UpdateCheckingMatch()
+void SceneDev2::UpdateCheckingMatch(float dt)
 {
 	CheckLineMatch();
-	
-	if (matchObjs.size() > 0)
+	state = GameState::CheckObj;
+}
+
+void SceneDev2::Test(float dt)
+{
+	bool isAllDiaObjMoved = true;
+
+	for (auto obj : matchObjs)
 	{
-		for (auto obj : matchObjs)
+		if (obj->GetType() == ObjectType::Diamond)
+		{
+			Move(dt, obj, sf::Vector2f({ 500.f, 500.f }), 5.f, MoveType::Lerp);
+
+			if (Utils::Distance(obj->GetPosition(), sf::Vector2f({ 500.f, 500.f })) > 0.5f)
+			{
+				isAllDiaObjMoved = false;
+			}
+		}
+	}
+
+	if (isAllDiaObjMoved)
+	{
+		StartAnim();  // 다이아몬드 이동 완료 후 애니메이션 시작
+	}
+}
+
+void SceneDev2::StartAnim()
+{
+	for (auto obj : matchObjs)
+	{
+		if (obj->GetType() != ObjectType::Diamond && obj != nullptr)
 		{
 			obj->PlayClearEffect();
 		}

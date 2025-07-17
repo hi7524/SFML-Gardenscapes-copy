@@ -49,6 +49,7 @@ protected:
 	sf::Vector2f dragStartPos = { 0.f, 0.f };
 
 	UiCanvas* canvas;
+	std::set<Object*> movingDiamonds;
 
 public:
 	SceneDev2();
@@ -62,7 +63,9 @@ public:
 
 	void UpdateIdle();
 	void UpdateSwapping(float dt);
-	void UpdateCheckingMatch();
+	void Test(float dt);
+	void StartAnim();
+	void UpdateCheckingMatch(float dt);
 	void UpdateAnimating();
 	void UpdateMoving(float dt);
 
