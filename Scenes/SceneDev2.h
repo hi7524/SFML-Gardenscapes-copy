@@ -40,7 +40,7 @@ protected:
 	bool isMovingObjs = false; // 오브젝트 움직이고 있는중인지 저장할 bool변수
 	bool isSpawning = false;
 
-	float objectMoveSpeed = 350.f;
+	float objectMoveSpeed = 550.f;
 
 	GameState state = GameState::Idle;
 

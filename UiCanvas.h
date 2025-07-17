@@ -34,4 +34,5 @@ public:
 	void SetSwapCountText(int count);
 	void SetObjCountText(int count);
 	void ClickButton();
+	sf::Vector2f GetTargetSprPos() const { return diamondSprite.GetPosition(); }
 };

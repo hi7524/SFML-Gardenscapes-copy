@@ -149,9 +149,10 @@ void SceneDev2::Test(float dt)
 	{
 		if (obj->GetType() == ObjectType::Diamond)
 		{
-			Move(dt, obj, sf::Vector2f({ 500.f, 500.f }), 5.f, MoveType::Lerp);
+			sf::Vector2f targetPos = canvas->GetTargetSprPos();
+			Move(dt, obj, targetPos, 800.f, MoveType::Default);
 
-			if (Utils::Distance(obj->GetPosition(), sf::Vector2f({ 500.f, 500.f })) > 0.5f)
+			if (Utils::Distance(obj->GetPosition(), targetPos) > 0.5f)
 			{
 				isAllDiaObjMoved = false;
 			}
@@ -160,7 +161,7 @@ void SceneDev2::Test(float dt)
 
 	if (isAllDiaObjMoved)
 	{
-		StartAnim();  // 다이아몬드 이동 완료 후 애니메이션 시작
+		StartAnim();
 	}
 }
 
@@ -377,7 +378,6 @@ void SceneDev2::MoveDown(float dt)
 	}
 }
 
-
 void SceneDev2::clearClickedInfo()
 {
 	// 초기화
@@ -406,8 +406,8 @@ void SceneDev2::SwapObjs(float dt)
 	// 스왑 완료 전
 	if (!isSwapped)
 	{
-		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj2Pos, dt * 9.f);
-		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj1Pos, dt * 9.f);
+		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj2Pos, dt * 14.f);
+		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj1Pos, dt * 14.f);
 
 		selectedObj1->SetPosition(nextPos1);
 		selectedObj2->SetPosition(nextPos2);
@@ -445,8 +445,8 @@ void SceneDev2::SwapObjs(float dt)
 	// 복구
 	else if (isReverting)
 	{
-		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj1Pos, dt * 9.f);
-		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj2Pos, dt * 9.f);
+		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj1Pos, dt * 14.f);
+		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj2Pos, dt * 14.f);
 
 		selectedObj1->SetPosition(nextPos1);
 		selectedObj2->SetPosition(nextPos2);
@@ -822,7 +822,6 @@ void SceneDev2::DragObj()
 		if (InputMgr::GetMouseButtonUp(sf::Mouse::Left) && selectedObj2 == nullptr)
 		{
 			selectedObj1 = nullptr;
-			std::cout << "마우스 뗌 " << std::endl;
 		}
 	}
 }
