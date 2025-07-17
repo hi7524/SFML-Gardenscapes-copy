@@ -6,8 +6,9 @@
 class UiCanvas : public GameObject
 {
 private:
-	sf::Text swapCountText;
+	sf::Text stageText;
 	sf::Text objCountText;
+	sf::Text swapCountText;
 	SpriteGo diamondSprite;
 
 	sf::Text stageClearText;

@@ -27,6 +27,7 @@ void SceneDev2::Init()
 	texIds.push_back("graphics/lava.png");
 	texIds.push_back("graphics/potato.png");
 	texIds.push_back("graphics/background.png");
+	texIds.push_back("graphics/sign.png");
 	texIds.push_back("graphics/effects.png");
 	texIds.push_back("graphics/button.png");
 	texIds.push_back("graphics/buttonHighlighted.png");
@@ -56,6 +57,13 @@ void SceneDev2::Enter()
 	background->Init();
 	background->Reset();
 	AddGameObject(background);
+
+	SpriteGo* sign = new SpriteGo("graphics/sign.png");
+	sign->Init();
+	sign->Reset();
+	sign->SetPosition({ 100.f, 360.f });
+	sign->SetOrigin(Origins::MC);
+	AddGameObject(sign);
 
 	canvas = (UiCanvas*)AddGameObject(new UiCanvas());
 	canvas->Init();
