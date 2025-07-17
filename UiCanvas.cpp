@@ -88,20 +88,17 @@ void UiCanvas::Update(float dt)
 
 void UiCanvas::Draw(sf::RenderWindow& window)
 {
-	if (!pauseUI)
-	{
-		window.draw(stageText);
-		diamondSprite.Draw(window);
-		window.draw(objCountText);
-		window.draw(swapCountText);
-	}
-	else
+	window.draw(stageText);
+	diamondSprite.Draw(window);
+	window.draw(objCountText);
+	window.draw(swapCountText);
+
+	if (pauseUI)
 	{
 		window.draw(background);
 		btnBackToGame->Draw(window);
 		btnQuit->Draw(window);
 	}
-
 	
 	//window.draw(stageClearText);
 }
