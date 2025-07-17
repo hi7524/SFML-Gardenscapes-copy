@@ -40,6 +40,13 @@ public:
 	bool GetIsMove() const { return isMoving; }
 
 	void PlayClearEffect();
+	bool IsPlaying()
+	{
+		std::string b;
+		animator.IsPlaying() ? b = "true" : b = "false";
+		std::cout << b << std::endl;
+		return animator.IsPlaying();
+	}
 
 	sf::FloatRect GetGlobalBounds() const override
 	{

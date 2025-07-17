@@ -113,13 +113,38 @@ void SceneDev2::UpdateIdle()
 void SceneDev2::UpdateSwapping(float dt)
 {
 	SwapObjs(dt);
+	CheckLineMatch();
+	
+	if (matchObjs.size() > 0)
+	{
+		for (auto obj : matchObjs)
+		{
+			obj->PlayClearEffect();
+		}
+	}
 }
 
 void SceneDev2::UpdateCheckingMatchSwap()
 {
-	CheckLineMatch();
-	DeleteMatchObjs();
-	state = GameState::Moving;
+	if (matchObjs.size() > 0)
+	{
+		bool animAllStop = true;
+
+		for (auto obj : matchObjs)
+		{
+			if (obj->IsPlaying())
+			{
+				animAllStop = false;
+				break;
+			}
+		}
+
+		if (animAllStop)
+		{
+			DeleteMatchObjs();
+			state = GameState::Moving;
+		}
+	}
 }
 
 void SceneDev2::UpdateMoving(float dt)
