@@ -796,15 +796,16 @@ void SceneDev2::DragObj()
 	}
 }
 
-// 2차원 배열 1차원 배열로 변경
-int SceneDev2::To1D(int i, int j)
-{
-	return i * 7 + j;
-}
-
 void SceneDev2::Exit()
 {
 	Scene::Exit();
+
+	for (auto obj : gameObjects)
+	{
+		obj->Release();
+		delete obj;
+	}
+	gameObjects.clear();
 
 	for (int i = 0; i < 7; ++i)
 	{
@@ -816,7 +817,6 @@ void SceneDev2::Exit()
 	}
 
 	matchObjs.clear();
-
 	selectedObj1 = nullptr;
 	selectedObj2 = nullptr;
 	selectedObj1Pos = vectorZero;

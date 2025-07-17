@@ -43,8 +43,12 @@ void SceneDev1::Enter()
 	AddGameObject(title);
 
 	subTitle->Init();
+	subTitle->Reset();
 	subTitle->sortingLayer = SortingLayers::UI;
 	subTitle->SetString("SFML Gardenscape copy");
+	subTitle->SetCharacterSize(25);
+	subTitle->SetOrigin(Origins::BL);
+	subTitle->SetPosition({ 15, windowSize.y - 15 });
 	AddGameObject(subTitle);
 
 	// 시작 버튼

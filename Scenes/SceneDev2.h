@@ -68,21 +68,17 @@ public:
 
 	bool IsSwappable(const Object* a, const Object* b);
 	void Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType);
-	//bool Test(const Object* obj);
 	void MoveDown(float dt);
 	void clearClickedInfo();
 	void SwapObjs(float dt);
 	void CreateSlots();
-	int To1D(int i, int j);
 	void CreateObjs();
 	void ChangeObj(Object* obj, int x, int y);
 	void SpawnObj(int idx1, int idx2);
-	//void SpawnObject(sf::Vector2f spawnPos);
 	void MouseOnObj();
 	void CheckLineMatch();
 	void DeleteMatchObjs();
 	bool IsEmptyBelow(int c, int r);
 	bool IsAllObjectsStopped();
 	void DragObj();
-	//void SwapObjs(float dt);
 };
