@@ -64,9 +64,13 @@ void SceneDev2::Update(float dt)
 	{
 		UpdateSwapping(dt);
 	}
-	else if (state == GameState::CheckingMatch)
+	else if (state == GameState::CheckMatch)
 	{
 		UpdateCheckingMatch();
+	}
+	else if (state == GameState::Animation)
+	{
+		UpdateAnimating();
 	}
 	else if (state == GameState::Moving)
 	{
@@ -108,6 +112,10 @@ void SceneDev2::UpdateIdle()
 void SceneDev2::UpdateSwapping(float dt)
 {
 	SwapObjs(dt);
+}
+
+void SceneDev2::UpdateCheckingMatch()
+{
 	CheckLineMatch();
 	
 	if (matchObjs.size() > 0)
@@ -117,9 +125,11 @@ void SceneDev2::UpdateSwapping(float dt)
 			obj->PlayClearEffect();
 		}
 	}
+
+	state = GameState::Animation;
 }
 
-void SceneDev2::UpdateCheckingMatch()
+void SceneDev2::UpdateAnimating()
 {
 	if (matchObjs.empty())
 	{
@@ -148,6 +158,7 @@ void SceneDev2::UpdateCheckingMatch()
 		state = GameState::Moving;
 	}
 }
+
 void SceneDev2::UpdateMoving(float dt)
 {
 	MoveDown(dt);
@@ -236,7 +247,7 @@ void SceneDev2::UpdateMoving(float dt)
 
 	if (frameCount >= 3)
 	{
-		state = GameState::CheckingMatch;
+		state = GameState::CheckMatch;
 	}
 }
 
@@ -329,7 +340,7 @@ void SceneDev2::clearClickedInfo()
 	isSwapped = false;
 	isReverting = false;
 
-	state = GameState::CheckingMatch;
+	state = GameState::CheckMatch;
 }
 
 // 오브젝트 스왑

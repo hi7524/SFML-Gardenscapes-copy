@@ -62,6 +62,7 @@ public:
 	void UpdateIdle();
 	void UpdateSwapping(float dt);
 	void UpdateCheckingMatch();
+	void UpdateAnimating();
 	void UpdateMoving(float dt);
 
 	bool IsSwappable(const Object* a, const Object* b);
