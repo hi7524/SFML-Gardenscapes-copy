@@ -28,8 +28,20 @@ void SceneDev2::Init()
 	texIds.push_back("graphics/potato.png");
 	texIds.push_back("graphics/background.png");
 	texIds.push_back("graphics/effects.png");
+	texIds.push_back("graphics/button.png");
+	texIds.push_back("graphics/buttonHighlighted.png");
 
 	fontIds.push_back("fonts/minecraft_font.ttf");
+
+	for (int i = 0; i < 7; ++i)
+	{
+		for (int j = 0; j < 7; ++j)
+		{
+			slots[i][j] = nullptr;
+			objectArr[i][j] = nullptr;
+		}
+	}
+	matchObjs.clear();
 
 	Scene::Init();
 }
@@ -48,6 +60,7 @@ void SceneDev2::Enter()
 	canvas = (UiCanvas*)AddGameObject(new UiCanvas());
 	canvas->Init();
 	canvas->Reset();
+	canvas->pauseUI = false;
 
 	CreateSlots(); // 초기 슬롯 생성
 	CreateObjs(); // 초기 오브젝트 생성
@@ -77,6 +90,11 @@ void SceneDev2::Update(float dt)
 		UpdateMoving(dt);
 	}
 
+	if (InputMgr::GetKeyDown(sf::Keyboard::Escape))
+	{
+		canvas->pauseUI = !canvas->pauseUI;
+	}
+
 	Scene::Update(dt);
 }
 
@@ -84,7 +102,6 @@ void SceneDev2::Draw(sf::RenderWindow& window)
 {
 	Scene::Draw(window);
 }
-
 
 void SceneDev2::UpdateIdle()
 {
@@ -783,4 +800,33 @@ void SceneDev2::DragObj()
 int SceneDev2::To1D(int i, int j)
 {
 	return i * 7 + j;
+}
+
+void SceneDev2::Exit()
+{
+	Scene::Exit();
+
+	for (int i = 0; i < 7; ++i)
+	{
+		for (int j = 0; j < 7; ++j)
+		{
+			slots[i][j] = nullptr;
+			objectArr[i][j] = nullptr;
+		}
+	}
+
+	matchObjs.clear();
+
+	selectedObj1 = nullptr;
+	selectedObj2 = nullptr;
+	selectedObj1Pos = vectorZero;
+	selectedObj2Pos = vectorZero;
+	isSwapped = false;
+	isReverting = false;
+	isMovingObjs = false;
+	isSpawning = false;
+	frameCount = 0;
+	swapCount = 22;
+	remainingTargetCount = 16;
+	state = GameState::Idle;
 }
