@@ -87,15 +87,15 @@ void SceneDev2::Update(float dt)
 	{
 		UpdateSwapping(dt);
 	}
-	else if (state == GameState::CheckMatch)
+	else if (state == GameState::CheckingMatch)
 	{
 		UpdateCheckingMatch(dt);
 	}
-	else if (state == GameState::CheckObj)
+	else if (state == GameState::CheckMatchedDiamondsMoved)
 	{
-		Test(dt);
+		UpdateMatchedDiamonds(dt);
 	}
-	else if (state == GameState::Animation)
+	else if (state == GameState::PlayingClearEffects)
 	{
 		UpdateAnimating();
 	}
@@ -155,16 +155,16 @@ void SceneDev2::UpdateIdle()
 
 void SceneDev2::UpdateSwapping(float dt)
 {
-	SwapObjs(dt);
+	ProcessSwapping(dt);
 }
 
 void SceneDev2::UpdateCheckingMatch(float dt)
 {
 	CheckLineMatch();
-	state = GameState::CheckObj;
+	state = GameState::CheckMatchedDiamondsMoved;
 }
 
-void SceneDev2::Test(float dt)
+void SceneDev2::UpdateMatchedDiamonds(float dt)
 {
 	bool isAllDiaObjMoved = true;
 
@@ -184,11 +184,11 @@ void SceneDev2::Test(float dt)
 
 	if (isAllDiaObjMoved)
 	{
-		StartAnim();
+		PlayClearEffects();
 	}
 }
 
-void SceneDev2::StartAnim()
+void SceneDev2::PlayClearEffects()
 {
 	for (auto obj : matchObjs)
 	{
@@ -198,7 +198,7 @@ void SceneDev2::StartAnim()
 		}
 	}
 
-	state = GameState::Animation;
+	state = GameState::PlayingClearEffects;
 }
 
 void SceneDev2::UpdateAnimating()
@@ -210,6 +210,11 @@ void SceneDev2::UpdateAnimating()
 
 	if (matchObjs.empty())
 	{
+		if (remainingTargetCount != 0 && swapCount == 0)
+		{
+			std::cout << "스테이지 실패" << std::endl;
+		}
+
 		state = GameState::Idle;
 		return;
 	}
@@ -319,7 +324,7 @@ void SceneDev2::UpdateMoving(float dt)
 
 	if (frameCount >= 3)
 	{
-		state = GameState::CheckMatch;
+		state = GameState::CheckingMatch;
 	}
 }
 
@@ -401,33 +406,33 @@ void SceneDev2::MoveDown(float dt)
 	}
 }
 
-void SceneDev2::clearClickedInfo()
+void SceneDev2::ResetSelectedObjects()
 {
 	// 초기화
 	selectedObj1 = nullptr;
 	selectedObj2 = nullptr;
-	selectedObj1Pos = vectorZero;
-	selectedObj2Pos = vectorZero;
-	isSwapped = false;
-	isReverting = false;
+	selectedObj1Pos = zeroVector;
+	selectedObj2Pos = zeroVector;
+	hasSwapped = false;
+	isRevertingSwap = false;
 
-	state = GameState::CheckMatch;
+	state = GameState::CheckingMatch;
 }
 
 // 오브젝트 스왑
-void SceneDev2::SwapObjs(float dt)
+void SceneDev2::ProcessSwapping(float dt)
 {
 	if (swapCount <= 0 || selectedObj1 == nullptr || selectedObj2 == nullptr)
 		return;
 
-	if (selectedObj1Pos == vectorZero && selectedObj2Pos == vectorZero)
+	if (selectedObj1Pos == zeroVector && selectedObj2Pos == zeroVector)
 	{
 		selectedObj1Pos = selectedObj1->GetPosition();
 		selectedObj2Pos = selectedObj2->GetPosition();
 	}
 
 	// 스왑 완료 전
-	if (!isSwapped)
+	if (!hasSwapped)
 	{
 		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj2Pos, dt * 14.f);
 		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj1Pos, dt * 14.f);
@@ -450,23 +455,23 @@ void SceneDev2::SwapObjs(float dt)
 
 			// 매치 체크
 			CheckLineMatch();
-			isSwapped = true;
+			hasSwapped = true;
 
 			// 매치가 없으면 복구
 			if (matchObjs.size() > 0)
 			{
-				clearClickedInfo();
+				ResetSelectedObjects();
 				swapCount--;
 				canvas->SetSwapCountText(swapCount);
 			}
 			else
 			{
-				isReverting = true;
+				isRevertingSwap = true;
 			}
 		}
 	}
 	// 복구
-	else if (isReverting)
+	else if (isRevertingSwap)
 	{
 		sf::Vector2f nextPos1 = Utils::Lerp(selectedObj1->GetPosition(), selectedObj1Pos, dt * 14.f);
 		sf::Vector2f nextPos2 = Utils::Lerp(selectedObj2->GetPosition(), selectedObj2Pos, dt * 14.f);
@@ -485,7 +490,7 @@ void SceneDev2::SwapObjs(float dt)
 			selectedObj2->SetIndex(index1);
 			std::swap(objectArr[index1.x][index1.y], objectArr[index2.x][index2.y]);
 
-			clearClickedInfo();
+			ResetSelectedObjects();
 		}
 	}
 }
@@ -757,32 +762,6 @@ void SceneDev2::DeleteMatchObjs()
 	matchObjs.clear();
 }
 
-// 아래 슬롯이 비어있는지 여부 확인
-bool SceneDev2::IsEmptyBelow(int c, int r)
-{
-	if (objectArr[c][r])
-	{
-		// 마지막이므로 아래에 더이상 내려갈 수 없음
-		if (c == 6)
-		{
-			return false;
-		}
-
-		if (objectArr[c + 1][r] == nullptr)
-		{
-			return true;
-		}
-
-		if (!objectArr[c + 1][r]->GetActive())
-		{
-			return true;
-		}
-
-		return false;
-	}
-	return false;
-}
-
 bool SceneDev2::IsAllObjectsStopped()
 {
 	for (int i = 0; i < 7; i++)
@@ -873,10 +852,10 @@ void SceneDev2::Exit()
 	matchObjs.clear();
 	selectedObj1 = nullptr;
 	selectedObj2 = nullptr;
-	selectedObj1Pos = vectorZero;
-	selectedObj2Pos = vectorZero;
-	isSwapped = false;
-	isReverting = false;
+	selectedObj1Pos = zeroVector;
+	selectedObj2Pos = zeroVector;
+	hasSwapped = false;
+	isRevertingSwap = false;
 	isMovingObjs = false;
 	isSpawning = false;
 	frameCount = 0;

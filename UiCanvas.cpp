@@ -52,7 +52,7 @@ void UiCanvas::Reset()
 	stageClearText.setString("Stage1 Clear");
 	stageClearText.setFillColor(sf::Color::Yellow);
 	stageClearText.setCharacterSize(40);
-	stageClearText.setPosition(windowSize * 0.5f);
+	stageClearText.setPosition({ windowSize.x * 0.5f, windowSize.y * 0.5f - 100.f });
 	Utils::SetOrigin(stageClearText, Origins::MC);
 
 	background.setSize(windowSize);
@@ -64,6 +64,7 @@ void UiCanvas::Reset()
 	btnBackToGame->SetText("Back to Game");
 	btnBackToGame->SetOnClick([this]() {
 		pauseUI = false;
+		FRAMEWORK.SetTimeScale(1);
 		});
 
 	btnQuitToTitle->Init();
@@ -89,10 +90,10 @@ void UiCanvas::Reset()
 
 void UiCanvas::Update(float dt)
 {
-	if (pauseUI)
-	{
-		ClickButton();
-	}
+    if (pauseUI || stageClearUI)
+    {
+        ClickButton();
+    }
 }
 
 void UiCanvas::Draw(sf::RenderWindow& window)
@@ -109,7 +110,7 @@ void UiCanvas::Draw(sf::RenderWindow& window)
 		btnBackToTitle2->Draw(window);
 	}
 
-	if (pauseUI)
+	if (pauseUI && !stageClearUI)
 	{
 		window.draw(background);
 		btnBackToGame->Draw(window);

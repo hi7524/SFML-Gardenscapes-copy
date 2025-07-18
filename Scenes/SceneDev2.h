@@ -29,12 +29,12 @@ protected:
 
 	sf::Vector2f selectedObj1Pos = { 0.f, 0.f };
 	sf::Vector2f selectedObj2Pos = { 0.f, 0.f };
-	sf::Vector2f vectorZero = { 0.f, 0.f };
+	sf::Vector2f zeroVector = { 0.f, 0.f };
 
-	bool isSwapped = false;
-	bool isReverting = false;
+	bool hasSwapped = false;
+	bool isRevertingSwap = false;
 
-	int swapCount = 22;
+	int swapCount = 3;
 	int remainingTargetCount = 16;
 
 	bool isMovingObjs = false; // 오브젝트 움직이고 있는중인지 저장할 bool변수
@@ -49,7 +49,6 @@ protected:
 	sf::Vector2f dragStartPos = { 0.f, 0.f };
 
 	UiCanvas* canvas;
-	std::set<Object*> movingDiamonds;
 
 public:
 	SceneDev2();
@@ -63,8 +62,8 @@ public:
 
 	void UpdateIdle();
 	void UpdateSwapping(float dt);
-	void Test(float dt);
-	void StartAnim();
+	void UpdateMatchedDiamonds(float dt);
+	void PlayClearEffects();
 	void UpdateCheckingMatch(float dt);
 	void UpdateAnimating();
 	void UpdateMoving(float dt);
@@ -72,8 +71,8 @@ public:
 	bool IsSwappable(const Object* a, const Object* b);
 	void Move(float dt, Object* obj, sf::Vector2f targetPos, float speed, MoveType moveType);
 	void MoveDown(float dt);
-	void clearClickedInfo();
-	void SwapObjs(float dt);
+	void ResetSelectedObjects();
+	void ProcessSwapping(float dt);
 	void CreateSlots();
 	void CreateObjs();
 	void ChangeObj(Object* obj, int x, int y);
@@ -81,7 +80,6 @@ public:
 	void MouseOnObj();
 	void CheckLineMatch();
 	void DeleteMatchObjs();
-	bool IsEmptyBelow(int c, int r);
 	bool IsAllObjectsStopped();
 	void DragObj();
 };

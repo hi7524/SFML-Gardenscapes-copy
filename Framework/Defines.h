@@ -54,10 +54,10 @@ enum class GameState
 {
 	Idle, // 대기 (기본 상황)
 	Swapping, // 변경 (이동, 변경 가능 여부 검사, 정보 변경까지 포함)
-	CheckMatch, // 매치 체크 (한 번 호출)
-	CheckObj,  // 매치된 오브젝트의 타입 검사 및 애니메이션 재생
+	CheckingMatch, // 매치 체크 (한 번 호출)
+	CheckMatchedDiamondsMoved,  // 매치된 오브젝트의 타입 검사 및 애니메이션 재생
 	StartAnim, // clearEffect 재생 (한 번 호출)
-	Animation, //  
+	PlayingClearEffects, //  
 	Moving,
 	End,
 };
