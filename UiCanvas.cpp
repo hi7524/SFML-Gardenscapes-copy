@@ -66,16 +66,25 @@ void UiCanvas::Reset()
 		pauseUI = false;
 		});
 
-	btnQuit->Init();
-	btnQuit->Reset();
-	btnQuit->SetPosition({ windowSize.x * 0.5f, 400.f });
-	btnQuit->SetText("Quit to Title");
-	btnQuit->SetOnClick([]() {
+	btnQuitToTitle->Init();
+	btnQuitToTitle->Reset();
+	btnQuitToTitle->SetPosition({ windowSize.x * 0.5f, 400.f });
+	btnQuitToTitle->SetText("Quit to Title");
+	btnQuitToTitle->SetOnClick([]() {
+		SCENE_MGR.ChangeScene(SceneIds::Dev1);
+		});
+
+	btnBackToTitle2->Init();
+	btnBackToTitle2->Reset();
+	btnBackToTitle2->SetPosition({ windowSize.x * 0.5f, 400.f });
+	btnBackToTitle2->SetText("Go back to Title");
+	btnBackToTitle2->SetOnClick([]() {
 		SCENE_MGR.ChangeScene(SceneIds::Dev1);
 		});
 
 	buttons.push_back(btnBackToGame);
-	buttons.push_back(btnQuit);
+	buttons.push_back(btnQuitToTitle);
+	buttons.push_back(btnBackToTitle2);
 }
 
 void UiCanvas::Update(float dt)
@@ -95,14 +104,16 @@ void UiCanvas::Draw(sf::RenderWindow& window)
 
 	if (stageClearUI)
 	{
+		window.draw(background);
 		window.draw(stageClearText);
+		btnBackToTitle2->Draw(window);
 	}
 
 	if (pauseUI)
 	{
 		window.draw(background);
 		btnBackToGame->Draw(window);
-		btnQuit->Draw(window);
+		btnQuitToTitle->Draw(window);
 	}
 }
 

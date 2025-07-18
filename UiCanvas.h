@@ -14,11 +14,12 @@ private:
 	// 일시정지
 	sf::RectangleShape background;
 	ButtonGo* btnBackToGame = new ButtonGo();
-	ButtonGo* btnQuit = new ButtonGo();
+	ButtonGo* btnQuitToTitle = new ButtonGo();
 
 	// 스테이지 클리어
 	sf::Text stageClearText;
 	float size = 1;
+	ButtonGo* btnBackToTitle2 = new ButtonGo();
 
 	std::vector<ButtonGo*> buttons;
 

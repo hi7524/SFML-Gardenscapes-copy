@@ -51,6 +51,8 @@ void SceneDev2::Enter()
 {
 	Scene::Enter();
 
+	FRAMEWORK.SetTimeScale(1);
+
 	ANI_CLIP_MGR.Load("animations/effect.csv");
 
 	SpriteGo* background = new SpriteGo("graphics/background.png");
@@ -108,8 +110,16 @@ void SceneDev2::Update(float dt)
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::Escape))
 	{
-		canvas->pauseUI = !canvas->pauseUI;
-		FRAMEWORK.GetTimeScale() ? FRAMEWORK.SetTimeScale(0) : FRAMEWORK.SetTimeScale(1);
+		if (FRAMEWORK.GetTimeScale() == 1)
+		{
+			FRAMEWORK.SetTimeScale(0);
+			canvas->pauseUI = true;
+		}
+		else
+		{
+			FRAMEWORK.SetTimeScale(1);
+			canvas->pauseUI = false;
+		}
 	}
 
 	Scene::Update(dt);
