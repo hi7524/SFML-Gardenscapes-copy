@@ -34,7 +34,7 @@ protected:
 	bool hasSwapped = false;
 	bool isRevertingSwap = false;
 
-	int swapCount = 3;
+	int swapCount = 22;
 	int remainingTargetCount = 16;
 
 	bool isMovingObjs = false; // 오브젝트 움직이고 있는중인지 저장할 bool변수

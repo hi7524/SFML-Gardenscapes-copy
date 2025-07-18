@@ -26,6 +26,7 @@ private:
 public:
 	bool pauseUI = false;
 	bool stageClearUI = false;
+	bool stageFailedUI = false;
 
 	UiCanvas(const std::string& name = "");
 	~UiCanvas() override = default;

@@ -72,6 +72,9 @@ void SceneDev2::Enter()
 	canvas->Reset();
 	canvas->pauseUI = false;
 
+	canvas->SetSwapCountText(swapCount);
+	canvas->SetObjCountText(remainingTargetCount);
+
 	CreateSlots(); // 초기 슬롯 생성
 	CreateObjs(); // 초기 오브젝트 생성
 }
@@ -213,6 +216,7 @@ void SceneDev2::UpdateAnimating()
 		if (remainingTargetCount != 0 && swapCount == 0)
 		{
 			std::cout << "스테이지 실패" << std::endl;
+			canvas->stageFailedUI = true;
 		}
 
 		state = GameState::Idle;

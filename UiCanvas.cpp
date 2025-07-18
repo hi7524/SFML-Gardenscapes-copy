@@ -90,7 +90,7 @@ void UiCanvas::Reset()
 
 void UiCanvas::Update(float dt)
 {
-    if (pauseUI || stageClearUI)
+    if (pauseUI || stageClearUI || stageFailedUI)
     {
         ClickButton();
     }
@@ -106,11 +106,19 @@ void UiCanvas::Draw(sf::RenderWindow& window)
 	if (stageClearUI)
 	{
 		window.draw(background);
+		stageClearText.setString("Stage Clear");
+		window.draw(stageClearText);
+		btnBackToTitle2->Draw(window);
+	}
+	else if (stageFailedUI)
+	{
+		window.draw(background);
+		stageClearText.setString("Stage Failed T.T");
 		window.draw(stageClearText);
 		btnBackToTitle2->Draw(window);
 	}
 
-	if (pauseUI && !stageClearUI)
+	if (pauseUI && !stageClearUI && !stageFailedUI)
 	{
 		window.draw(background);
 		btnBackToGame->Draw(window);
