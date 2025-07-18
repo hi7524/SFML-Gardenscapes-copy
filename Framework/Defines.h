@@ -48,6 +48,7 @@ enum class MoveType
 {
 	Default,
 	Lerp,
+	ArcMove,
 };
 
 enum class GameState

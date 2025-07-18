@@ -86,6 +86,7 @@ void Object::SetRandomType()
 	case ObjectType::Diamond:
 		objectType = ObjectType::Diamond;
 		texId = "graphics/diamond.png";
+		arcMoveDir = Utils::RandomRange(0, 2); // 0 È¤Àº 1
 		break;
 
 	case ObjectType::Cookie:

@@ -194,7 +194,7 @@ void SceneDev2::UpdateMatchedDiamonds(float dt)
 		if (obj->GetType() == ObjectType::Diamond)
 		{
 			sf::Vector2f targetPos = canvas->GetTargetSprPos();
-			Move(dt, obj, targetPos, 1000.f, MoveType::Default);
+			Move(dt, obj, targetPos, 850.f, MoveType::ArcMove);
 
 			if (Utils::Distance(obj->GetPosition(), targetPos) > 0.5f)
 			{
@@ -391,6 +391,20 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 	else if (moveType == MoveType::Lerp)
 	{
 		pos = Utils::Lerp(obj->GetPosition(), targetPos, dt * speed);
+	}
+	else if (moveType == MoveType::ArcMove)
+	{
+		pos = obj->GetPosition() + dir * speed * dt;
+		float sinY = sin(Utils::DegreeToRadian(pos.x) * 0.2f) * 0.6f;
+
+		if (obj->arcMoveDir == 0)
+		{
+			pos.y += sinY;
+		}
+		if (obj->arcMoveDir == 1)
+		{
+			pos.y -= sinY;
+		}
 	}
 
 	obj->SetPosition(pos);
