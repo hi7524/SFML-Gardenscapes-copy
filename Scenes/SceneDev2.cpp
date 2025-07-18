@@ -182,6 +182,10 @@ void SceneDev2::UpdateSwapping(float dt)
 void SceneDev2::UpdateCheckingMatch(float dt)
 {
 	CheckLineMatch();
+	if (matchObjs.size() > 0)
+	{
+		SOUND_MGR.PlaySfx("sound/pop.ogg", false);
+	}
 	state = GameState::CheckMatchedDiamondsMoved;
 }
 
@@ -227,7 +231,6 @@ void SceneDev2::PlayClearEffects()
 		if (obj->GetType() != ObjectType::Diamond && obj != nullptr)
 		{
 			obj->PlayClearEffect();
-			SOUND_MGR.PlaySfx("sound/pop.ogg", false);
 		}
 	}
 

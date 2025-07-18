@@ -17,7 +17,7 @@ void UiCanvas::Release()
 
 void UiCanvas::Reset()
 {
-	sf::Vector2f windowSize = FRAMEWORK.GetWindowSizeF();
+	windowSize = FRAMEWORK.GetWindowSizeF();
 
 	stageText.setFont(FONT_MGR.Get("fonts/minecraft_font.ttf"));
 	objCountText.setFont(FONT_MGR.Get("fonts/minecraft_font.ttf"));
@@ -52,7 +52,7 @@ void UiCanvas::Reset()
 	stageClearText.setString("Stage1 Clear");
 	stageClearText.setFillColor(sf::Color::Yellow);
 	stageClearText.setCharacterSize(40);
-	stageClearText.setPosition({ windowSize.x * 0.5f, windowSize.y * 0.5f - 100.f });
+	stageClearText.setPosition({ windowSize.x * 0.5f, 0.f });
 	Utils::SetOrigin(stageClearText, Origins::MC);
 
 	background.setSize(windowSize);
@@ -94,6 +94,12 @@ void UiCanvas::Update(float dt)
     {
         ClickButton();
     }
+
+	if (stageClearUI)
+	{
+		sf::Vector2f pos = Utils::Lerp(stageClearText.getPosition(), sf::Vector2f({ windowSize.x * 0.5f, windowSize.y * 0.5f - 80.f }), dt * 10, true);
+		stageClearText.setPosition(pos);
+	}
 }
 
 void UiCanvas::Draw(sf::RenderWindow& window)

@@ -23,6 +23,8 @@ private:
 
 	std::vector<ButtonGo*> buttons;
 
+	sf::Vector2f windowSize;
+
 public:
 	bool pauseUI = false;
 	bool stageClearUI = false;
