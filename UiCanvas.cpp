@@ -93,14 +93,17 @@ void UiCanvas::Draw(sf::RenderWindow& window)
 	window.draw(objCountText);
 	window.draw(swapCountText);
 
+	if (stageClearUI)
+	{
+		window.draw(stageClearText);
+	}
+
 	if (pauseUI)
 	{
 		window.draw(background);
 		btnBackToGame->Draw(window);
 		btnQuit->Draw(window);
 	}
-	
-	//window.draw(stageClearText);
 }
 
 void UiCanvas::SetSwapCountText(int count)

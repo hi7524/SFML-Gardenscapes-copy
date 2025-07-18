@@ -730,6 +730,7 @@ void SceneDev2::DeleteMatchObjs()
 			if (remainingTargetCount < 0)
 			{
 				remainingTargetCount = 0;
+				canvas->stageClearUI = true;
 				state == GameState::End;
 			}
 			canvas->SetObjCountText(remainingTargetCount);

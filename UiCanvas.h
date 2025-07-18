@@ -11,17 +11,20 @@ private:
 	sf::Text swapCountText;
 	SpriteGo diamondSprite;
 
-	sf::Text stageClearText;
-
 	// 일시정지
 	sf::RectangleShape background;
 	ButtonGo* btnBackToGame = new ButtonGo();
 	ButtonGo* btnQuit = new ButtonGo();
 
+	// 스테이지 클리어
+	sf::Text stageClearText;
+	float size = 1;
+
 	std::vector<ButtonGo*> buttons;
 
 public:
 	bool pauseUI = false;
+	bool stageClearUI = false;
 
 	UiCanvas(const std::string& name = "");
 	~UiCanvas() override = default;
