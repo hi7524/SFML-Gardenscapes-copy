@@ -126,14 +126,22 @@ void UiCanvas::Draw(sf::RenderWindow& window)
 	}
 }
 
+void UiCanvas::SetStageText(int num)
+{
+	stageText.setString(std::to_string(num));
+	Utils::SetOrigin(stageText, Origins::MC);
+}
+
 void UiCanvas::SetSwapCountText(int count)
 {
 	swapCountText.setString(std::to_string(count));
+	Utils::SetOrigin(swapCountText, Origins::MC);
 }
 
 void UiCanvas::SetObjCountText(int count)
 {
 	objCountText.setString(std::to_string(count));
+	Utils::SetOrigin(objCountText, Origins::ML);
 }
 
 void UiCanvas::ClickButton()

@@ -72,6 +72,7 @@ void SceneDev2::Enter()
 	canvas->Reset();
 	canvas->pauseUI = false;
 
+	canvas->SetStageText(stageNum);
 	canvas->SetSwapCountText(swapCount);
 	canvas->SetObjCountText(remainingTargetCount);
 

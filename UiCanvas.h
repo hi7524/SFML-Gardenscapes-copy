@@ -37,6 +37,7 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
+	void SetStageText(int num);
 	void SetSwapCountText(int count);
 	void SetObjCountText(int count);
 	void ClickButton();

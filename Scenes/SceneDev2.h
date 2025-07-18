@@ -8,7 +8,8 @@ class UiCanvas;
 class SceneDev2 : public Scene
 {
 protected:
-	// 1스테이지 맵 모양
+	// 1스테이지 정보
+	int stageNum = 1;
 	int mapList[7][7] =
 	{
 		{0, 1, 1, 1, 1, 1, 0},
