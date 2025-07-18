@@ -59,7 +59,7 @@ void Object::Reset()
 {
 	SetRandomType();
 	object.setTexture(TEXTURE_MGR.Get(texId));
-
+	isSoundPlayed = false;
 	Utils::SetOrigin(object, Origins::MC);
 }
 

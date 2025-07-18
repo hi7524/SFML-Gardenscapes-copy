@@ -34,6 +34,11 @@ void SceneDev2::Init()
 
 	fontIds.push_back("fonts/minecraft_font.ttf");
 
+	soundIds.push_back("sound/orb.ogg");
+	soundIds.push_back("sound/pop.ogg");
+	soundIds.push_back("sound/remove_item1.ogg");
+	soundIds.push_back("sound/click.ogg");
+
 	for (int i = 0; i < 7; ++i)
 	{
 		for (int j = 0; j < 7; ++j)
@@ -136,6 +141,18 @@ void SceneDev2::Draw(sf::RenderWindow& window)
 
 void SceneDev2::UpdateIdle()
 {
+	// 스테이지 클리어 확인
+	if (remainingTargetCount == 0 && swapCount >= 0)
+	{
+		canvas->stageClearUI = true;
+	}
+
+	// 스테이지 실패 확인
+	if (remainingTargetCount > 0 && swapCount <= 0)
+	{
+		canvas->stageFailedUI = true;
+	}
+
 	if (!isMovingObjs)
 	{
 		MouseOnObj();
@@ -177,11 +194,22 @@ void SceneDev2::UpdateMatchedDiamonds(float dt)
 		if (obj->GetType() == ObjectType::Diamond)
 		{
 			sf::Vector2f targetPos = canvas->GetTargetSprPos();
-			Move(dt, obj, targetPos, 800.f, MoveType::Default);
+			Move(dt, obj, targetPos, 1000.f, MoveType::Default);
 
 			if (Utils::Distance(obj->GetPosition(), targetPos) > 0.5f)
 			{
 				isAllDiaObjMoved = false;
+			}
+			else if (!obj->isSoundPlayed)
+			{
+				SOUND_MGR.PlaySfx("sound/orb.ogg", false);
+				obj->isSoundPlayed = true;
+				remainingTargetCount--;
+				if (remainingTargetCount < 0)
+				{
+					remainingTargetCount = 0;
+				}
+				canvas->SetObjCountText(remainingTargetCount);
 			}
 		}
 	}
@@ -199,6 +227,7 @@ void SceneDev2::PlayClearEffects()
 		if (obj->GetType() != ObjectType::Diamond && obj != nullptr)
 		{
 			obj->PlayClearEffect();
+			SOUND_MGR.PlaySfx("sound/pop.ogg", false);
 		}
 	}
 
@@ -214,12 +243,6 @@ void SceneDev2::UpdateAnimating()
 
 	if (matchObjs.empty())
 	{
-		if (remainingTargetCount != 0 && swapCount == 0)
-		{
-			std::cout << "스테이지 실패" << std::endl;
-			canvas->stageFailedUI = true;
-		}
-
 		state = GameState::Idle;
 		return;
 	}
@@ -744,18 +767,6 @@ void SceneDev2::DeleteMatchObjs()
 
 	for (auto obj : matchObjs)
 	{
-		if (obj->GetType() == ObjectType::Diamond)
-		{
-			remainingTargetCount--;
-			if (remainingTargetCount < 0)
-			{
-				remainingTargetCount = 0;
-				canvas->stageClearUI = true;
-				state == GameState::End;
-			}
-			canvas->SetObjCountText(remainingTargetCount);
-		}
-
 		if (obj != nullptr)
 		{
 			obj->SetActive(false);

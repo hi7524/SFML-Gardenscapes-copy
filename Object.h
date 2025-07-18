@@ -14,6 +14,8 @@ protected:
 	Animator animator;
 
 public:
+	bool isSoundPlayed = false;
+
 	Object(const std::string& name = "");
 	virtual ~Object() = default;
 
