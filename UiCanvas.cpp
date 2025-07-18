@@ -38,7 +38,7 @@ void UiCanvas::Reset()
 	sf::Vector2f diaSpritePos = diamondSprite.GetPosition();
 	sf::Vector2f countTxtPos = { diaSpritePos.x + 8.f, diaSpritePos.y + 20.f };
 	objCountText.setString("16");
-	objCountText.setFillColor(sf::Color::Black);
+	objCountText.setFillColor(sf::Color::White);
 	objCountText.setCharacterSize(21);
 	Utils::SetOrigin(objCountText, Origins::ML);
 	objCountText.setPosition(countTxtPos);

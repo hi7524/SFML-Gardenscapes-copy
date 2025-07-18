@@ -57,6 +57,7 @@ void Object::Release()
 
 void Object::Reset()
 {
+	sortingOrder = 5;
 	SetRandomType();
 	object.setTexture(TEXTURE_MGR.Get(texId));
 	isSoundPlayed = false;
@@ -87,6 +88,7 @@ void Object::SetRandomType()
 		objectType = ObjectType::Diamond;
 		texId = "graphics/diamond.png";
 		arcMoveDir = Utils::RandomRange(0, 2); // 0 È¤Àº 1
+		sortingOrder = 6;
 		break;
 
 	case ObjectType::Cookie:
