@@ -101,10 +101,15 @@ void SceneDev2::Update(float dt)
 	{
 		UpdateMoving(dt);
 	}
+	else if (state == GameState::End)
+	{
+		
+	}
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::Escape))
 	{
 		canvas->pauseUI = !canvas->pauseUI;
+		FRAMEWORK.GetTimeScale() ? FRAMEWORK.SetTimeScale(0) : FRAMEWORK.SetTimeScale(1);
 	}
 
 	Scene::Update(dt);
@@ -725,7 +730,7 @@ void SceneDev2::DeleteMatchObjs()
 			if (remainingTargetCount < 0)
 			{
 				remainingTargetCount = 0;
-				std::cout << "스테이지 클리어" << std::endl;
+				state == GameState::End;
 			}
 			canvas->SetObjCountText(remainingTargetCount);
 		}

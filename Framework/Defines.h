@@ -59,4 +59,5 @@ enum class GameState
 	StartAnim, // clearEffect 재생 (한 번 호출)
 	Animation, //  
 	Moving,
+	End,
 };
