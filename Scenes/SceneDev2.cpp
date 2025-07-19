@@ -38,6 +38,8 @@ void SceneDev2::Init()
 	soundIds.push_back("sound/pop.ogg");
 	soundIds.push_back("sound/remove_item1.ogg");
 	soundIds.push_back("sound/click.ogg");
+	soundIds.push_back("sound/challenge_complete.ogg");
+	soundIds.push_back("sound/WetHands.ogg");
 
 	for (int i = 0; i < 7; ++i)
 	{
@@ -55,6 +57,9 @@ void SceneDev2::Init()
 void SceneDev2::Enter()
 {
 	Scene::Enter();
+
+	SOUND_MGR.PlayBgm("sound/WetHands.ogg", true);
+	SOUND_MGR.SetBgmVolume(30);
 
 	FRAMEWORK.SetTimeScale(1);
 
@@ -145,6 +150,8 @@ void SceneDev2::UpdateIdle()
 	if (remainingTargetCount == 0 && swapCount >= 0)
 	{
 		canvas->stageClearUI = true;
+		SOUND_MGR.PlaySfx("sound/challenge_complete.ogg", false);
+		state = GameState::End;
 	}
 
 	// 스테이지 실패 확인
