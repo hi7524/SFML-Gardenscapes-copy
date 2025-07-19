@@ -16,6 +16,7 @@ protected:
 public:
 	bool isSoundPlayed = false;
 	int arcMoveDir = 0;
+	float elapsedTime = 0.f;
 
 	Object(const std::string& name = "");
 	virtual ~Object() = default;
