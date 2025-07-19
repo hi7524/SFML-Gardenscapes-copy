@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Animator.h"
+#include <SFML/System/Clock.hpp>
 
 class Object : public GameObject
 {
@@ -17,6 +18,10 @@ public:
 	bool isSoundPlayed = false;
 	int arcMoveDir = 0;
 	float elapsedTime = 0.f;
+	bool isArcMoveStarted = false;
+	sf::Clock arcMoveClock;
+
+	sf::Vector2f startPos = { 0.f, 0.f };
 
 	Object(const std::string& name = "");
 	virtual ~Object() = default;

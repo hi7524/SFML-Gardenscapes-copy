@@ -114,7 +114,7 @@ void SceneDev2::Update(float dt)
 	}
 	else if (state == GameState::End)
 	{
-		
+
 	}
 
 	if (InputMgr::GetKeyDown(sf::Keyboard::Escape))
@@ -199,8 +199,7 @@ void SceneDev2::UpdateMatchedDiamonds(float dt)
 		{
 			sf::Vector2f targetPos = canvas->GetTargetSprPos();
 
-			obj->elapsedTime = 0.f;
-			Move(dt, obj, targetPos, 850.f, MoveType::ArcMove);
+			Move(dt, obj, targetPos, 0.6f, MoveType::ArcMove);
 
 			if (Utils::Distance(obj->GetPosition(), targetPos) > 0.5f)
 			{
@@ -387,6 +386,12 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 	{
 		obj->SetPosition(targetPos);
 		obj->SetIsMove(false);
+
+		if (moveType == MoveType::ArcMove)
+		{
+			obj->isArcMoveStarted = false;
+		}
+
 		return;
 	}
 
@@ -401,17 +406,30 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 	}
 	else if (moveType == MoveType::ArcMove)
 	{
-		//obj->elapsedTime += dt;
+		if (obj->startPos == zeroVector)
+		{
+			obj->startPos = obj->GetPosition();
+			obj->elapsedTime = 0.f;
+		}
 
-		float sinY = sin(dt) * 500.f;
+		obj->elapsedTime += dt;
 
-		pos = obj->GetPosition() + dir * speed * dt; 
+		float t = obj->elapsedTime / speed;
+		t = Utils::Clamp01(t);
+
+		// 기본 직선 이동
+		pos = Utils::Lerp(obj->startPos, targetPos, t);
+
+		float totalDistance = Utils::Distance(obj->startPos, targetPos);
+		float amplitude = totalDistance * 0.2f;
+
+		float sinY = sin(t * 3.14f) * amplitude; 
 		if (obj->arcMoveDir == 0)
 		{
 			pos.y += sinY;
 		}
-		else if (obj->arcMoveDir == 1)
-		{
+		else
+		{ 
 			pos.y -= sinY;
 		}
 	}
