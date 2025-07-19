@@ -377,16 +377,18 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 {
 	obj->SetIsMove(true);
 
-	if (Utils::Distance(targetPos, obj->GetPosition()) <= 0.5f)
+	sf::Vector2f pos;
+	sf::Vector2f dir = Utils::GetNormal(targetPos - obj->GetPosition());
+	float moveStep = speed * dt;
+
+	if (moveStep >= Utils::Distance(targetPos, obj->GetPosition()))
 	{
 		obj->SetPosition(targetPos);
 		obj->SetIsMove(false);
 		return;
 	}
 
-	sf::Vector2f dir = Utils::GetNormal(targetPos - obj->GetPosition());
-	sf::Vector2f pos;
-
+	// ÀÌµ¿
 	if (moveType == MoveType::Default)
 	{
 		pos = obj->GetPosition() + dir * speed * dt;
@@ -398,7 +400,7 @@ void SceneDev2::Move(float dt, Object* obj, sf::Vector2f targetPos, float speed,
 	else if (moveType == MoveType::ArcMove)
 	{
 		pos = obj->GetPosition() + dir * speed * dt;
-		float sinY = sin(Utils::DegreeToRadian(pos.x) * 0.2f) * 0.6f;
+		float sinY = sin(Utils::DegreeToRadian(pos.x) * 0.2f) * 0.2f;
 
 		if (obj->arcMoveDir == 0)
 		{
