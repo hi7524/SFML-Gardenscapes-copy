@@ -95,7 +95,7 @@ void UiCanvas::Update(float dt)
         ClickButton();
     }
 
-	if (stageClearUI)
+	if (stageClearUI || stageFailedUI)
 	{
 		sf::Vector2f pos = Utils::Lerp(stageClearText.getPosition(), sf::Vector2f({ windowSize.x * 0.5f, windowSize.y * 0.5f - 80.f }), dt * 10, true);
 		stageClearText.setPosition(pos);
