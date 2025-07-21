@@ -163,7 +163,6 @@ void UiCanvas::ClickButton()
 				&& (btn->GetGlobalBounds().top <= mousePos.y && mousePos.y <= btn->GetGlobalBounds().top + btn->GetGlobalBounds().height))
 			{
 				btn->OnClick();
-				SOUND_MGR.PlaySfx("sound/click.ogg", false);
 				break;
 			}
 		}
